@@ -1,0 +1,40 @@
+{
+  "version": "0.0.1",
+  "name": "xml-streamer",
+  "description": "XML stream parser for parsing large files efficiently with less usage of memory.",
+  "author": {
+    "name": "Sai Teja",
+    "email": "saitejas464@gmail.com"
+  },
+  "keywords": [
+    "xml",
+    "xml streaming",
+    "xml streamer",
+    "streaming",
+    "xml parser",
+    "xml parsing",
+    "xml2js",
+    "xmltojs"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Sai1919/xml-streamer"
+  },
+  "dependencies": {
+    "node-expat": "2.3.15",
+    "lodash": "4.16.6"
+  },
+  "devDependencies": {
+    "mocha": "3.1.2",
+    "should": "11.1.1"
+  },
+  "optionalDependencies": {},
+  "main": "./parser",
+  "maintainers": [
+    {
+      "name": "Sai Teja",
+      "email": "saitejas464@gmail.com"
+    }
+  ]
+}
