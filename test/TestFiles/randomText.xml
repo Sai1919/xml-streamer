@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items>
+<item id="1" test= 'hello'> item
+  one <subitem sub= "TESTING SUB">one</subitem>
+  <subitem sub= "2">two</subitem> two
+</item>
+<item id="2"> item
+  one<subitem>three</subitem> two
+  <subitem>four</subitem> three
+  four<subitem>five</subitem>
+</item>
+</items>
