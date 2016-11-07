@@ -9,8 +9,9 @@ function XmlParser (opts) {
   this.opts = opts || {}
   this.parserState = new ParserState()
   this.parser = new expat.Parser('UTF-8')
-  var transformOpts = { readableObjectMode: true }
-  stream.Transform.call(this, transformOpts)
+  // var transformOpts = { readableObjectMode: true }
+  stream.Transform.call(this)
+  this._readableState.objectMode = true
 }
 util.inherits(XmlParser, stream.Transform)
 
