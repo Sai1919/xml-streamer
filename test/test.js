@@ -7,7 +7,7 @@ describe('Tests', function () {
   describe('simple behaviour testing', function () {
     it('should properly parse a simple file.', function (done) {
       var xmlStream = fs.createReadStream('./test/TestFiles/item.xml')
-      var parser = new ParserFactory(xmlStream, {resourcePath: '/items/item'})
+      var parser = new ParserFactory({resourcePath: '/items/item'})
       var expectedData = [
                            { '$': { id: '1', test: 'hello' },
                              subitem:
@@ -39,7 +39,7 @@ describe('Tests', function () {
 
     it('should properly parse a medium size file.', function (done) {
       var xmlStream = fs.createReadStream('./test/TestFiles/medium.xml')
-      var parser = new ParserFactory(xmlStream, {resourcePath: '/items/item'})
+      var parser = new ParserFactory({resourcePath: '/items/item'})
 
       var dataEventCount = 0
 
@@ -61,7 +61,7 @@ describe('Tests', function () {
 
     it('should properly parse a file containing many nodes.', function (done) {
       var xmlStream = fs.createReadStream('./test/TestFiles/manyItems.xml')
-      var parser = new ParserFactory(xmlStream, {resourcePath: '/items/item'})
+      var parser = new ParserFactory({resourcePath: '/items/item'})
 
       var dataEventCount = 0
 
@@ -83,7 +83,7 @@ describe('Tests', function () {
 
     it('should properly parse a xml simple file in which nodes contain text values randomly.', function (done) {
       var xmlStream = fs.createReadStream('./test/TestFiles/randomText.xml')
-      var parser = new ParserFactory(xmlStream, {resourcePath: '/items/item'})
+      var parser = new ParserFactory({resourcePath: '/items/item'})
       var expectedData = [ { '$': { 'id': '1', 'test': 'hello' }, '_': ' item  one  two',
                              'subitem': [ { '$': { 'sub': 'TESTING SUB' }, '_': 'one' },
                                           { '$': { 'sub': '2' }, '_': 'two' } ] },
@@ -107,6 +107,49 @@ describe('Tests', function () {
         // console.log('dataEventCount=', dataEventCount)
         actualData.should.deepEqual(expectedData)
         dataEventCount.should.equal(2)
+        done()
+      })
+      xmlStream.pipe(parser)
+    })
+
+    it('should properly parse a file containing many nodes.', function (done) {
+      var xmlStream = fs.createReadStream('./test/TestFiles/manyItems.xml')
+      var parser = new ParserFactory({resourcePath: '/items/item'})
+      // console.log(parser)
+      var dataEventCount = 0
+
+      parser.on('data', function (data) {
+        dataEventCount++
+      })
+
+      parser.on('error', function (err) {
+        done(err)
+      })
+
+      parser.on('end', function () {
+        // console.log('dataEventCount=', dataEventCount)
+        dataEventCount.should.equal(296)
+        done()
+      })
+      xmlStream.pipe(parser)
+    })
+
+    it('should properly parse a huge file.', function (done) {
+      var xmlStream = fs.createReadStream('./test/TestFiles/hugeFile.xml')
+      var parser = new ParserFactory({resourcePath: '/items/item'})
+      // console.log(parser)
+      var dataEventCount = 0
+      parser.on('data', function (data) {
+        dataEventCount++
+      })
+
+      parser.on('error', function (err) {
+        done(err)
+      })
+
+      parser.on('end', function () {
+        // console.log('dataEventCount=', dataEventCount)
+        dataEventCount.should.equal(2072)
         done()
       })
       xmlStream.pipe(parser)

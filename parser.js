@@ -1,56 +1,69 @@
 var expat = require('node-expat')
 var _ = require('lodash')
+var util = require('util')
+var stream = require('stream')
+
 var ParserState = require('./parserState')
 
-function XmlParser (xmlStream, opts) {
+function XmlParser (opts) {
   this.opts = opts || {}
   this.parserState = new ParserState()
   this.parser = new expat.Parser('UTF-8')
-  var scope = this
-  this.parser.pause = function () {
-    xmlStream.pause()
-    scope.parser.stop()
-  }
-  this.parser.restart = function () {
-    scope.parser.resume()
-    xmlStream.resume()
-  }
-  process.nextTick(function () {
-    parse.call(scope, xmlStream)
-  })
-  return this.parser
+  var transformOpts = { readableObjectMode: true }
+  stream.Transform.call(this, transformOpts)
+}
+util.inherits(XmlParser, stream.Transform)
+
+XmlParser.prototype._transform = function (chunk, encoding, callback) {
+  if (!this.opts.resourcePath) this.emit('error', new Error('resourcePath missing'))
+  if (encoding !== 'buffer') this.emit('error', new Error('unsupported encoding'))
+
+  this.parse(chunk)
+  callback()
 }
 
-function parse (xmlStream) {
-  if (!this.opts.resourcePath) this.parser.emit('error', new Error('resourcePath missing'))
+XmlParser.prototype.parse = function (chunk) {
   var scope = this
-  var parser = scope.parser
+  var parser = this.parser
   var state = this.parserState
   var lastIndex
   var resourcePath = this.opts.resourcePath
 
-  parser.on('startElement', function (name, attrs) {
-    if (state.isRootNode) validateResourcePath(name)
-    state.currentPath = state.currentPath + '/' + name
-    checkForResourcePath(name)
-    if (state.isPathfound) processStartElement(name, attrs)
-  })
+  if (state.isRootNode) registerEvents()
 
-  parser.on('endElement', function (name) {
-    state.lastEndedNode = name
-    lastIndex = state.currentPath.lastIndexOf('/' + name)
-    state.currentPath = state.currentPath.substring(0, lastIndex)
-    if (state.isPathfound) processEndElement(name)
-    checkForResourcePath(name)
-  })
+  if (typeof chunk === 'string') {
+    parser.parse('', true)
+  } else {
+    parser.parse(chunk.toString())
+  }
 
-  parser.on('text', function (text) {
-    if (state.isPathfound) processText(text)
-  })
+  function registerEvents () {
+    parser.on('startElement', function (name, attrs) {
+      if (state.isRootNode) validateResourcePath(name)
+      state.currentPath = state.currentPath + '/' + name
+      checkForResourcePath(name)
+      if (state.isPathfound) processStartElement(name, attrs)
+    })
 
-  parser.on('end', function () {
-    parser.emit('finish')
-  })
+    parser.on('endElement', function (name) {
+      state.lastEndedNode = name
+      lastIndex = state.currentPath.lastIndexOf('/' + name)
+      state.currentPath = state.currentPath.substring(0, lastIndex)
+      if (state.isPathfound) processEndElement(name)
+      checkForResourcePath(name)
+    })
+
+    parser.on('text', function (text) {
+      if (state.isPathfound) processText(text)
+    })
+
+    parser.on('error', function (err) {
+      scope.emit('error', new Error(err + 'at line no:' + parser.getCurrentLineNumber() + ' on column no:' + parser.getCurrentColumnNumber()))
+    })
+
+    parser.on('end', function () {
+    })
+  }
 
   function processStartElement (name, attrs) {
     if (!name) return
@@ -81,8 +94,8 @@ function parse (xmlStream) {
     var rpath = resourcePath.substring(0, index)
 
     if (rpath === state.currentPath) {
-      if (scope.opts.emitEventsOnNodeName) parser.emit(name, state.object)
-      parser.emit('data', state.object)
+      if (scope.opts.emitEventsOnNodeName) scope.emit(name, state.object)
+      scope.push(state.object)
       state.object = {}
     }
   }
@@ -146,9 +159,14 @@ function parse (xmlStream) {
     temp = temp.substring(0, index)
 
     if (temp !== name) {
-      xmlStream.end()
+      this.end()
     }
   }
+}
+
+XmlParser.prototype._flush = function (callback) {
+  this.parse('')
+  callback()
 }
 
 module.exports = XmlParser
