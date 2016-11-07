@@ -31,6 +31,9 @@
   },
   "optionalDependencies": {},
   "main": "./parser",
+  "scripts": {
+    "test": "mocha"
+  },
   "maintainers": [
     {
       "name": "Sai Teja",
