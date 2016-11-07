@@ -39,5 +39,8 @@
       "name": "Sai Teja",
       "email": "saitejas464@gmail.com"
     }
-  ]
+  ],
+  "standard": {
+    "globals": [ "describe", "it" ]
+  }
 }
