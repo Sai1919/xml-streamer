@@ -4,9 +4,14 @@ var util = require('util')
 var stream = require('stream')
 
 var ParserState = require('./parserState')
-
+var defaults = {
+  resourcePath: '',
+  emitOnNodeName: false,
+  attrsKey: '$',
+  textKey: '_'
+}
 function XmlParser (opts) {
-  this.opts = opts || {}
+  this.opts = _.defaults(opts, defaults)
   this.parserState = new ParserState()
   this.parser = new expat.Parser('UTF-8')
   // var transformOpts = { readableObjectMode: true }
@@ -29,13 +34,15 @@ XmlParser.prototype.parse = function (chunk) {
   var state = this.parserState
   var lastIndex
   var resourcePath = this.opts.resourcePath
+  var attrsKey = this.opts.attrsKey
+  var textKey = this.opts.textKey
 
   if (state.isRootNode) registerEvents()
 
   if (typeof chunk === 'string') {
-    parser.parse('', true)
+    if (!parser.parse('', true)) processError()
   } else {
-    parser.parse(chunk.toString())
+    if (!parser.parse(chunk.toString())) processError()
   }
 
   function registerEvents () {
@@ -59,21 +66,33 @@ XmlParser.prototype.parse = function (chunk) {
     })
 
     parser.on('error', function (err) {
-      scope.emit('error', new Error(err + 'at line no:' + parser.getCurrentLineNumber() + ' on column no:' + parser.getCurrentColumnNumber()))
+      processError(err)
     })
 
     parser.on('end', function () {
+      scope.emit('end')
     })
+  }
+
+  function processError (err) {
+    var error = ''
+
+    if (err) {
+      error = err
+    } else {
+      error = parser.getError()
+    }
+    scope.emit('error', new Error(error + ' at line no: ' + parser.getCurrentLineNumber()))
   }
 
   function processStartElement (name, attrs) {
     if (!name) return
     var obj = {}
-    if (attrs && !_.isEmpty(attrs)) obj.$ = attrs
+    if (attrs && !_.isEmpty(attrs)) obj[attrsKey] = attrs
     var tempObj = state.object
     var path = getRelativePath(name)
     if (!path) {
-      if (attrs && !_.isEmpty(attrs)) state.object.$ = attrs
+      if (attrs && !_.isEmpty(attrs)) state.object[attrsKey] = attrs
       return
     }
     var tokens = path.split('.')
@@ -95,7 +114,7 @@ XmlParser.prototype.parse = function (chunk) {
     var rpath = resourcePath.substring(0, index)
 
     if (rpath === state.currentPath) {
-      if (scope.opts.emitEventsOnNodeName) scope.emit(name, state.object)
+      if (scope.opts.emitOnNodeName) scope.emit(name, state.object)
       scope.push(state.object)
       state.object = {}
     }
@@ -108,8 +127,8 @@ XmlParser.prototype.parse = function (chunk) {
     var path = getRelativePath()
     var tempObj = state.object
     if (!path) {
-      if (!state.object._) state.object._ = ''
-      state.object._ = state.object._ + text
+      if (!state.object[textKey]) state.object[textKey] = ''
+      state.object[textKey] = state.object[textKey] + text
       return
     }
     var tokens = path.split('.')
@@ -123,8 +142,8 @@ XmlParser.prototype.parse = function (chunk) {
       if (Array.isArray(tempObj) && i !== tokens.length - 1) tempObj = tempObj[tempObj.length - 1]
     }
     var obj = tempObj[tempObj.length - 1]
-    if (!obj._) obj._ = ''
-    obj._ = obj._ + text
+    if (!obj[textKey]) obj[textKey] = ''
+    obj[textKey] = obj[textKey] + text
   }
 
   function checkForResourcePath (name) {
@@ -157,10 +176,9 @@ XmlParser.prototype.parse = function (chunk) {
       temp = resourcePath
     }
     index = temp.indexOf('/')
-    temp = temp.substring(0, index)
-
+    if (index !== -1) temp = temp.substring(0, index)
     if (temp !== name) {
-      this.end()
+      scope.end()
     }
   }
 }
