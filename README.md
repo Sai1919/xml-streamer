@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/Sai1919/xml-streamer.svg?branch=master)](https://travis-ci.org/Sai1919/xml-streamer)
 ## Motivation
 
-You use [Node.js](https://nodejs.org) for speed? You process XML streams? Then you want the fastest XML to JS parser: [xml-streamer]!
+You use [Node.js](https://nodejs.org) for speed? You process XML streams? Then you want the fastest XML to JS parser: xml-streamer
 
 ## Install
 
@@ -79,26 +79,30 @@ npm install xml-streamer
            if you are interested in `items` nodes then resourcePath would be: `/items`
 
 * `emitOnNodeName`: `Type: Boolean` Optional field. Set this to true if you want to listen on node names instead of data event. `default: false`
+            
             // Ex: consider the above XML snippet
+             ```javascript
                 if you are interested in `item` nodes. You can listen for `data` event by default to get those nodes in JS object form
-                        ```javascript
+                        
                           parser.on('data', function (data) {
                              // item nodes as javascipt objects
                           })
-                        ```
+
                 or else you can set `emitOnNodeName: true` and listen on node names like
-                        ```javascript
+
                           parser.on('item', function (data) {
                              // item nodes as javascipt objects
                           })
-                        ```
+             ```
+
                 `NOTE:` when you set `emitOnNodeName:true` "data" events are emitted normally. So make sure you don't listen for both the events.
   
 * `attrsKey`: `Type: String` Optional field. pass the value with which you want to reference attributes of a node in its object form. `default: '$'`
                   
 * `textKey`: `Type: String` Optional field. pass the value with which you want to reference node value in its object form. `default: '_'`
+                   
                    // In the above XML snippet `subitem` node will look like this after converted to javascript object
-                        ```javascript
+                  ```javascript
                           {
                               "$": {
                                   "sub": "TESTING SUB"
@@ -112,7 +116,7 @@ npm install xml-streamer
                               },
                               "text": "one"
                           }
-                        ```
+                  ```
                      // Then set `attrsKey= "attrs"` and `textKey= "text"`
 
 
