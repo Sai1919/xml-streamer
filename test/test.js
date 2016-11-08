@@ -25,6 +25,7 @@ describe('Tests', function () {
       })
 
       parser.on('error', function (err) {
+        should(err).not.be.ok()
         done(err)
       })
 
