@@ -1,3 +1,5 @@
+# xml-streamer
+
 [![Build Status](https://travis-ci.org/Sai1919/xml-streamer.svg?branch=master)](https://travis-ci.org/Sai1919/xml-streamer)
 ## Motivation
 
@@ -9,7 +11,7 @@ You use [Node.js](https://nodejs.org) for speed? You process XML streams? Then y
 npm install xml-streamer
 ```
 
-## Usage
+## Basic Usage
 
 ```javascript
 (function () {
@@ -35,7 +37,10 @@ npm install xml-streamer
   })
 
   xmlStream.pipe(parser) // pipe your input xmlStream to parser.
-
+  // readable
+  parser.on('readable', function () {
+      // if you don't want to consume "data" on "data" events you can wait for readable event and consume data by calling parser.read() 
+  })
 }())
 
 ```
@@ -43,11 +48,80 @@ npm install xml-streamer
 ## API
 
 * `#on('readable' function () {})`
-* `#on('end' function () {})`
-* `#on('error' function (err) {})
-* `#on('nodeName' function (err) {//if you are interested listen on the "nodeName" instead of "data"})
+* `#on('end' function () {})` `Note: No end event will be emmited when error is emitted`
+* `#on('error' function (err) {})` 
+* `#on('nodeName' function (err) {})` //if you are interested to listen on the "nodeName" instead of "data"
 * `#stop()` pauses
 * `#resume()` resumes
+* `#read()` returns object if stream is readable
+
+## Available Constructor Options
+
+* `resourcePath`: `Type: String` Manditory field. Used to extract the XML nodes that you are interested in. 
+
+            // Ex: let the XML be
+                ```xml
+                    <?xml version="1.0" encoding="utf-8"?>
+                    <items>
+                        <item id="1" test= 'hello'>
+                            <subitem sub= "TESTING SUB">one</subitem>
+                            <subitem sub= "2">two</subitem>
+                        </item>
+                        <item id="2">
+                            <subitem>three</subitem>
+                            <subitem>four</subitem>
+                            <subitem>five</subitem>
+                        </item>
+                    </items>
+                ```
+           if you are interested in `item` nodes then resourcePath would be: `/items/item`
+           if you are interested in `subitem` nodes then resourcePath would be: `/items/item/subitem`
+           if you are interested in `items` nodes then resourcePath would be: `/items`
+
+* `emitOnNodeName`: `Type: Boolean` Optional field. Set this to true if you want to listen on node names instead of data event. `default: false`
+            // Ex: consider the above XML snippet
+                if you are interested in `item` nodes. You can listen for `data` event by default to get those nodes in JS object form
+                        ```javascript
+                          parser.on('data', function (data) {
+                             // item nodes as javascipt objects
+                          })
+                        ```
+                or else you can set `emitOnNodeName: true` and listen on node names like
+                        ```javascript
+                          parser.on('item', function (data) {
+                             // item nodes as javascipt objects
+                          })
+                        ```
+                `NOTE:` when you set `emitOnNodeName:true` "data" events are emitted normally. So make sure you don't listen for both the events.
+  
+* `attrsKey`: `Type: String` Optional field. pass the value with which you want to reference attributes of a node in its object form. `default: '$'`
+                  
+* `textKey`: `Type: String` Optional field. pass the value with which you want to reference node value in its object form. `default: '_'`
+                   // In the above XML snippet `subitem` node will look like this after converted to javascript object
+                        ```javascript
+                          {
+                              "$": {
+                                  "sub": "TESTING SUB"
+                              }
+                              "_": "one"
+                          }
+                          // if you want like this
+                          {
+                              "attrs": {
+                                  "sub": "TESTING SUB"
+                              },
+                              "text": "one"
+                          }
+                        ```
+                     // Then set `attrsKey= "attrs"` and `textKey= "text"`
+
+
+## upcoming features
+
+1. `allowing to listen on interested nodes instead of passing resourcePath in options`
+2. `handling of compressed streams`
+3. `handling of different encodings`
+
 
 ## Namespace handling
 
