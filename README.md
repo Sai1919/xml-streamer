@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/Sai1919/xml-streamer.svg?branch=master)](https://travis-ci.org/Sai1919/xml-streamer)
 ## Motivation
 
-You use [Node.js](https://nodejs.org) for speed? You process XML streams? Then you want the fastest XML to JS parser: xml-streamer
+You use [Node.js](https://nodejs.org) for speed? You process XML streams? Then you want the fastest XML to JS parser: xml-streamer, based on [node-expat](https://github.com/astro/node-expat)
 
 ## Install
 
