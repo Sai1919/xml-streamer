@@ -4,9 +4,10 @@ function ParserState () {
   this.lastEndedNode = ''
   this.isPathfound = false
   this.object = {}
-  this.buffer = []
   this.paused = false
   this.isRootNode = true
+  this.firstFoundNode = ''
+  this.interestedNodes = []
 }
 
 module.exports = ParserState

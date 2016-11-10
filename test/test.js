@@ -1,6 +1,7 @@
 var should = require('should')
 var fs = require('fs')
 var zlib = require('zlib')
+var stream = require('stream')
 
 var ParserFactory = require('../parser')
 
@@ -109,28 +110,6 @@ describe('Tests', function () {
         // console.log('dataEventCount=', dataEventCount)
         actualData.should.deepEqual(expectedData)
         dataEventCount.should.equal(2)
-        done()
-      })
-      xmlStream.pipe(parser)
-    })
-
-    it('should properly parse a file containing many nodes.', function (done) {
-      var xmlStream = fs.createReadStream('./test/TestFiles/manyItems.xml')
-      var parser = new ParserFactory({resourcePath: '/items/item'})
-      // console.log(parser)
-      var dataEventCount = 0
-
-      parser.on('data', function (data) {
-        dataEventCount++
-      })
-
-      parser.on('error', function (err) {
-        done(err)
-      })
-
-      parser.on('end', function () {
-        // console.log('dataEventCount=', dataEventCount)
-        dataEventCount.should.equal(296)
         done()
       })
       xmlStream.pipe(parser)
@@ -750,6 +729,499 @@ describe('Tests', function () {
         // console.log('dataEventCount=', dataEventCount)
         dataEventCount.should.equal(0)
         itemCount.should.equal(0)
+        done()
+      })
+      xmlStream.pipe(parser)
+    })
+  })
+
+  describe('interested Nodes', function () {
+    it('should properly parse a simple file.', function (done) {
+      var xmlStream = fs.createReadStream('./test/TestFiles/item.xml')
+      var parser = new ParserFactory()
+
+      var expectedData =
+        [
+          { '$': { sub: 'TESTING SUB' }, _: 'one' },
+          { '$': { sub: '2' }, _: 'two' },
+          { '$': { id: '1', test: 'hello' },
+            subitem: [ { '$': { sub: 'TESTING SUB' }, _: 'one' },
+                     { '$': { sub: '2' }, _: 'two' } ]
+          },
+          { _: 'three' },
+          { _: 'four' },
+          { _: 'five' },
+          { '$': { id: '2' },
+            subitem: [ { _: 'three' }, { _: 'four' }, { _: 'five' } ] }
+        ]
+
+      var actualData = []
+      var dataEventCount = 0
+      var expectedItems = [
+                           { '$': { id: '1', test: 'hello' },
+                             subitem:
+                             [ { '$': { sub: 'TESTING SUB' }, _: 'one' },
+                                  { '$': { sub: '2' }, _: 'two' } ] },
+                              { '$': { id: '2' },
+                                subitem: [ { _: 'three' }, { _: 'four' }, { _: 'five' } ] } ]
+      var actualItems = []
+      var actualSubitems = []
+      var expectedSubitems = [
+        { '$': { sub: 'TESTING SUB' }, _: 'one' },
+        { '$': { sub: '2' }, _: 'two' },
+        { _: 'three' },
+        { _: 'four' },
+        { _: 'five' }
+      ]
+
+      parser.on('data', function (data) {
+        actualData.push(data)
+        dataEventCount++
+      })
+
+      parser.on('error', function (err) {
+        should(err).not.be.ok()
+        done(err)
+      })
+
+      parser.on('item', function (item) {
+        actualItems.push(item)
+      })
+
+      parser.on('subitem', function (subitem) {
+        actualSubitems.push(subitem)
+      })
+
+      parser.on('end', function () {
+        // console.log('actualData=', JSON.stringify(actualData, null, 1))
+        // console.log('dataEventCount=', dataEventCount)
+        actualData.should.deepEqual(expectedData)
+        actualItems.should.deepEqual(expectedItems)
+        actualSubitems.should.deepEqual(expectedSubitems)
+        actualSubitems.length.should.equal(5)
+        actualItems.length.should.equal(2)
+        dataEventCount.should.equal(7)
+        done()
+      })
+
+      xmlStream.pipe(parser)
+    })
+
+    it('should properly parse a medium size file.', function (done) {
+      var xmlStream = fs.createReadStream('./test/TestFiles/medium.xml')
+      var parser = new ParserFactory()
+
+      var dataEventCount = 0
+      var itemEventCount = 0
+      var subitemEventCount = 0
+
+      parser.on('data', function (data) {
+        dataEventCount++
+      })
+
+      parser.on('error', function (err) {
+        done(err)
+      })
+
+      parser.on('item', function (item) {
+        itemEventCount++
+      })
+
+      parser.on('subitem', function (subitem) {
+        subitemEventCount++
+      })
+
+      parser.on('end', function () {
+        // console.log('dataEventCount=', dataEventCount)
+        // console.log('itemEventCount=', itemEventCount)
+        // console.log('subitemEventCount=', subitemEventCount)
+        dataEventCount.should.equal(31)
+        itemEventCount.should.equal(10)
+        subitemEventCount.should.equal(21)
+        done()
+      })
+      xmlStream.pipe(parser)
+    })
+
+    it('should properly parse a file containing many nodes.', function (done) {
+      var xmlStream = fs.createReadStream('./test/TestFiles/manyItems.xml')
+      var parser = new ParserFactory()
+
+      var dataEventCount = 0
+      var itemEventCount = 0
+      var subitemEventCount = 0
+
+      parser.on('data', function (data) {
+        dataEventCount++
+      })
+
+      parser.on('error', function (err) {
+        done(err)
+      })
+
+      parser.on('item', function (item) {
+        itemEventCount++
+      })
+
+      parser.on('subitem', function (subitem) {
+        subitemEventCount++
+      })
+
+      parser.on('end', function () {
+        // console.log('dataEventCount=', dataEventCount)
+        // console.log('itemEventCount=', itemEventCount)
+        // console.log('subitemEventCount=', subitemEventCount)
+        itemEventCount.should.equal(296)
+        subitemEventCount.should.equal(600)
+        dataEventCount.should.equal(896)
+        done()
+      })
+      xmlStream.pipe(parser)
+    })
+
+    it('should properly parse a xml simple file in which nodes contain text values randomly.', function (done) {
+      var xmlStream = fs.createReadStream('./test/TestFiles/randomText.xml')
+      var parser = new ParserFactory()
+      var expectedData =
+        [
+          { '$': { sub: 'TESTING SUB' }, _: 'one' },
+          { '$': { sub: '2' }, _: 'two' },
+          { '$': { id: '1', test: 'hello' }, _: ' item  one  two',
+            subitem: [ { '$': { sub: 'TESTING SUB' }, _: 'one' },
+                     { '$': { sub: '2' }, _: 'two' } ]
+          },
+          { _: 'three' },
+          { _: 'four' },
+          { _: 'five' },
+          { '$': { id: '2' }, '_': ' item  one two three  four',
+            subitem: [ { _: 'three' }, { _: 'four' }, { _: 'five' } ] }
+        ]
+      var expectedItems = [
+                           { '$': { id: '1', test: 'hello' }, _: ' item  one  two',
+                             subitem:
+                             [ { '$': { sub: 'TESTING SUB' }, _: 'one' },
+                                  { '$': { sub: '2' }, _: 'two' } ] },
+                              { '$': { id: '2' }, '_': ' item  one two three  four',
+                                subitem: [ { _: 'three' }, { _: 'four' }, { _: 'five' } ] } ]
+      var actualItems = []
+      var actualSubitems = []
+      var expectedSubitems = [
+        { '$': { sub: 'TESTING SUB' }, _: 'one' },
+        { '$': { sub: '2' }, _: 'two' },
+        { _: 'three' },
+        { _: 'four' },
+        { _: 'five' }
+      ]
+      var actualData = []
+      var dataEventCount = 0
+      var itemEventCount = 0
+      var subitemEventCount = 0
+
+      parser.on('data', function (data) {
+        actualData.push(data)
+        dataEventCount++
+      })
+
+      parser.on('error', function (err) {
+        done(err)
+      })
+
+      parser.on('item', function (item) {
+        itemEventCount++
+        actualItems.push(item)
+      })
+
+      parser.on('subitem', function (subitem) {
+        subitemEventCount++
+        actualSubitems.push(subitem)
+      })
+
+      parser.on('end', function () {
+        // console.log('actualData=', JSON.stringify(actualData, null, 1))
+        // console.log('dataEventCount=', dataEventCount)
+        // console.log('itemEventCount=', itemEventCount)
+        // console.log('subitemEventCount=', subitemEventCount)
+        actualData.should.deepEqual(expectedData)
+        actualItems.should.deepEqual(expectedItems)
+        actualSubitems.should.deepEqual(expectedSubitems)
+        dataEventCount.should.equal(7)
+        itemEventCount.should.equal(2)
+        subitemEventCount.should.equal(5)
+        done()
+      })
+      xmlStream.pipe(parser)
+    })
+
+    it('should properly parse a huge file.', function (done) {
+      var xmlStream = fs.createReadStream('./test/TestFiles/hugeFile.xml')
+      var parser = new ParserFactory()
+
+      var dataEventCount = 0
+      var itemEventCount = 0
+      var subitemEventCount = 0
+
+      parser.on('data', function (data) {
+        dataEventCount++
+      })
+
+      parser.on('error', function (err) {
+        done(err)
+      })
+
+      parser.on('item', function (item) {
+        itemEventCount++
+      })
+
+      parser.on('subitem', function (subitem) {
+        subitemEventCount++
+      })
+
+      parser.on('end', function () {
+        // console.log('dataEventCount=', dataEventCount)
+        // console.log('itemEventCount=', itemEventCount)
+        // console.log('subitemEventCount=', subitemEventCount)
+        dataEventCount.should.equal(6272)
+        itemEventCount.should.equal(2072)
+        subitemEventCount.should.equal(4200)
+        done()
+      })
+      xmlStream.pipe(parser)
+    })
+
+    it('should properly parse a simple file and return when root element when listening on it.', function (done) {
+      var xmlStream = fs.createReadStream('./test/TestFiles/item.xml')
+      var parser = new ParserFactory()
+      var expectedData =
+        [{ 'item': [{ '$': { 'id': '1', 'test': 'hello' },
+                      'subitem': [{ '$': { 'sub': 'TESTING SUB' }, '_': 'one' },
+                                  { '$': { 'sub': '2' }, '_': 'two' }]
+                    },
+                    { '$': { 'id': '2' }, 'subitem': [{ '_': 'three' }, { '_': 'four' },
+                                                      { '_': 'five' }]
+                    }]
+        }]
+
+      var actualData = []
+      var dataEventCount = 0
+      var itemsEventCount = 0
+
+      parser.on('data', function (data) {
+        actualData.push(data)
+        dataEventCount++
+      })
+
+      parser.on('error', function (err) {
+        should(err).not.be.ok()
+        done(err)
+      })
+
+      parser.on('items', function (item) {
+        itemsEventCount++
+      })
+
+      parser.on('end', function () {
+        // console.log('actualData=', JSON.stringify(actualData, null, 1))
+        // console.log('dataEventCount=', dataEventCount)
+        // console.log('itemEventCount=', itemsEventCount)
+        actualData.should.deepEqual(expectedData)
+        itemsEventCount.should.equal(1)
+        dataEventCount.should.equal(1)
+        done()
+      })
+      xmlStream.pipe(parser)
+    })
+  })
+
+  describe('performance testing', function () {
+    it('should properly parse more than 500 MB of file.', function (done) {
+      var firstChunk = fs.readFileSync('./test/TestFiles/MB_and_GB_size_files/firstChunk.xml')
+      var parser = new ParserFactory({resourcePath: '/items/item'})
+      // var wsStream = fs.createWriteStream('./test/TestFiles/MB_and_GB_size_files/MBFile.xml')
+      // var rsStream = fs.createReadStream('./test/TestFiles/MB_and_GB_size_files/MBFile.xml')
+      var dataEventCount = 0
+      // var maxRSSMemoryTaken = 0
+      // var rss
+      var startTime = Date.now()
+      var xmlStream = new stream.Readable()
+      xmlStream._read = function noop () {}
+      var dataChunk
+      this.timeout(900000)
+      xmlStream.push(firstChunk)
+      for (var i = 0; i < 2200; i++) {
+        dataChunk = fs.readFileSync('./test/TestFiles/MB_and_GB_size_files/repetitiveChunk.xml')
+        xmlStream.push(dataChunk)
+      }
+
+      var endingChunk = fs.readFileSync('./test/TestFiles/MB_and_GB_size_files/endingChunk.xml')
+      xmlStream.push(endingChunk)
+      xmlStream.push(null)
+      parser.on('data', function (data) {
+        // rss = process.memoryUsage().rss
+        // if (rss > maxRSSMemoryTaken) maxRSSMemoryTaken = rss
+        dataEventCount++
+      })
+
+      parser.on('error', function (err) {
+        should(err).not.be.ok()
+        done(err)
+      })
+
+      parser.on('end', function () {
+        // console.log('dataEventCount=', dataEventCount)
+        // console.log('RSS memory=', rss)
+        var TimeTaken = Date.now() - startTime
+        // console.log('time taken=', TimeTaken)
+        TimeTaken.should.be.belowOrEqual(300000)
+        dataEventCount.should.equal(4558400)
+        done()
+      })
+      xmlStream.pipe(parser)
+    })
+
+    it('should properly parse more than 1 GB of file.', function (done) {
+      var firstChunk = fs.readFileSync('./test/TestFiles/MB_and_GB_size_files/firstChunk.xml')
+      var parser = new ParserFactory({resourcePath: '/items/item'})
+      // var wsStream = fs.createWriteStream('./test/TestFiles/MB_and_GB_size_files/MBFile.xml')
+      // var rsStream = fs.createReadStream('./test/TestFiles/MB_and_GB_size_files/MBFile.xml')
+      var dataEventCount = 0
+      // var maxRSSMemoryTaken = 0
+      // var rss
+      var startTime = Date.now()
+      var xmlStream = new stream.Readable()
+      xmlStream._read = function noop () {}
+      var dataChunk
+      this.timeout(900000)
+      xmlStream.push(firstChunk)
+      for (var i = 0; i < 4400; i++) {
+        dataChunk = fs.readFileSync('./test/TestFiles/MB_and_GB_size_files/repetitiveChunk.xml')
+        xmlStream.push(dataChunk)
+      }
+
+      var endingChunk = fs.readFileSync('./test/TestFiles/MB_and_GB_size_files/endingChunk.xml')
+      xmlStream.push(endingChunk)
+      xmlStream.push(null)
+      parser.on('data', function (data) {
+        // rss = process.memoryUsage().rss
+        // if (rss > maxRSSMemoryTaken) maxRSSMemoryTaken = rss
+        dataEventCount++
+      })
+
+      parser.on('error', function (err) {
+        should(err).not.be.ok()
+        done(err)
+      })
+
+      parser.on('end', function () {
+        // console.log('dataEventCount=', dataEventCount)
+        // console.log('RSS memory=', rss)
+        var TimeTaken = Date.now() - startTime
+        // console.log('time taken=', TimeTaken)
+        TimeTaken.should.be.belowOrEqual(700000)
+        dataEventCount.should.equal(9116800)
+        done()
+      })
+      xmlStream.pipe(parser)
+    })
+  })
+
+  describe('nodes with same names', function () {
+    it('should properly parse a simple file containing nodes with same names.', function (done) {
+      var xmlStream = fs.createReadStream('./test/TestFiles/nodesWithSameNames.xml')
+      var parser = new ParserFactory()
+
+      var actualData = []
+      var actualItems = []
+      var dataEventCount = 0
+
+      parser.on('data', function (data) {
+        actualData.push(data)
+        dataEventCount++
+      })
+
+      parser.on('error', function (err) {
+        should(err).not.be.ok()
+        done(err)
+      })
+
+      parser.on('item', function (item) {
+        actualItems.push(item)
+      })
+
+      parser.on('end', function () {
+        actualItems.length.should.equal(18)
+        dataEventCount.should.equal(18)
+        done()
+      })
+
+      xmlStream.pipe(parser)
+    })
+
+    it('should properly parse a simple file containing nodes with same names and emit events on multiple nodes.', function (done) {
+      var xmlStream = fs.createReadStream('./test/TestFiles/nodesWithSameNames.xml')
+      var parser = new ParserFactory()
+
+      var dataEventCount = 0
+      var itemEventCount = 0
+      var subitemEventCount = 0
+
+      parser.on('data', function (data) {
+        dataEventCount++
+      })
+
+      parser.on('error', function (err) {
+        should(err).not.be.ok()
+        done(err)
+      })
+
+      parser.on('item', function (item) {
+        itemEventCount++
+      })
+
+      parser.on('subitem', function (subitem) {
+        subitemEventCount++
+      })
+
+      parser.on('end', function () {
+        itemEventCount.should.equal(18)
+        subitemEventCount.should.equal(13)
+        dataEventCount.should.equal(31)
+        done()
+      })
+
+      xmlStream.pipe(parser)
+    })
+
+    it('should properly parse a medium size file with same names randomly.', function (done) {
+      var xmlStream = fs.createReadStream('./test/TestFiles/nodesWithSameNamesRandomly.xml')
+      var parser = new ParserFactory()
+
+      var dataEventCount = 0
+      var itemEventCount = 0
+      var subitemEventCount = 0
+
+      parser.on('data', function (data) {
+        dataEventCount++
+      })
+
+      parser.on('error', function (err) {
+        done(err)
+      })
+
+      parser.on('item', function (item) {
+        itemEventCount++
+      })
+
+      parser.on('subitem', function (subitem) {
+        subitemEventCount++
+      })
+
+      parser.on('end', function () {
+        // console.log('dataEventCount=', dataEventCount)
+        // console.log('itemEventCount=', itemEventCount)
+        // console.log('subitemEventCount=', subitemEventCount)
+        dataEventCount.should.equal(32)
+        itemEventCount.should.equal(19)
+        subitemEventCount.should.equal(13)
         done()
       })
       xmlStream.pipe(parser)
