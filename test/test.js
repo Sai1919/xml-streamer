@@ -1034,7 +1034,6 @@ describe('Tests', function () {
 
   describe('performance testing', function () {
     it('should properly parse more than 500 MB of file.', function (done) {
-      var firstChunk = fs.readFileSync('./test/TestFiles/MB_and_GB_size_files/firstChunk.xml')
       var parser = new ParserFactory({resourcePath: '/items/item'})
       // var wsStream = fs.createWriteStream('./test/TestFiles/MB_and_GB_size_files/MBFile.xml')
       // var rsStream = fs.createReadStream('./test/TestFiles/MB_and_GB_size_files/MBFile.xml')
@@ -1046,6 +1045,7 @@ describe('Tests', function () {
       xmlStream._read = function noop () {}
       var dataChunk
       this.timeout(900000)
+      var firstChunk = fs.readFileSync('./test/TestFiles/MB_and_GB_size_files/firstChunk.xml')
       xmlStream.push(firstChunk)
       for (var i = 0; i < 2200; i++) {
         dataChunk = fs.readFileSync('./test/TestFiles/MB_and_GB_size_files/repetitiveChunk.xml')
@@ -1079,7 +1079,6 @@ describe('Tests', function () {
     })
 
     it('should properly parse more than 1 GB of file.', function (done) {
-      var firstChunk = fs.readFileSync('./test/TestFiles/MB_and_GB_size_files/firstChunk.xml')
       var parser = new ParserFactory({resourcePath: '/items/item'})
       // var wsStream = fs.createWriteStream('./test/TestFiles/MB_and_GB_size_files/MBFile.xml')
       // var rsStream = fs.createReadStream('./test/TestFiles/MB_and_GB_size_files/MBFile.xml')
@@ -1091,6 +1090,7 @@ describe('Tests', function () {
       xmlStream._read = function noop () {}
       var dataChunk
       this.timeout(900000)
+      var firstChunk = fs.readFileSync('./test/TestFiles/MB_and_GB_size_files/firstChunk.xml')
       xmlStream.push(firstChunk)
       for (var i = 0; i < 4400; i++) {
         dataChunk = fs.readFileSync('./test/TestFiles/MB_and_GB_size_files/repetitiveChunk.xml')
