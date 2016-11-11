@@ -1032,7 +1032,7 @@ describe('Tests', function () {
     })
   })
 
-  describe('performance testing', function () {
+  describe.skip('performance testing', function () {
     it('should properly parse more than 500 MB of file.', function (done) {
       var parser = new ParserFactory({resourcePath: '/items/item'})
       // var wsStream = fs.createWriteStream('./test/TestFiles/MB_and_GB_size_files/MBFile.xml')
