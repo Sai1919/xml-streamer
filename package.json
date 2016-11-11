@@ -1,5 +1,5 @@
 {
-  "version": "0.0.1",
+  "version": "0.0.2",
   "name": "xml-streamer",
   "description": "XML stream parser for parsing large files efficiently with less usage of memory.",
   "author": {
@@ -42,6 +42,9 @@
     }
   ],
   "standard": {
-    "globals": [ "describe", "it" ]
+    "globals": [
+      "describe",
+      "it"
+    ]
   }
 }
