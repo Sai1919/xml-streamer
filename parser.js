@@ -127,8 +127,8 @@ XmlParser.prototype.parse = function (chunk) {
       var rpath = resourcePath.substring(0, index)
 
       if (rpath === state.currentPath) {
-        if (scope.opts.emitOnNodeName) scope.emit(name, state.object)
         scope.push(state.object)
+        if (scope.opts.emitOnNodeName) scope.emit(name, state.object)
         state.object = {}
       }
     } else {
