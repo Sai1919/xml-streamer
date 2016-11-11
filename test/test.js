@@ -1216,9 +1216,9 @@ describe('Tests', function () {
       })
 
       parser.on('end', function () {
-        // console.log('dataEventCount=', dataEventCount)
-        // console.log('itemEventCount=', itemEventCount)
-        // console.log('subitemEventCount=', subitemEventCount)
+        console.log('dataEventCount=', dataEventCount)
+        console.log('itemEventCount=', itemEventCount)
+        console.log('subitemEventCount=', subitemEventCount)
         dataEventCount.should.equal(32)
         itemEventCount.should.equal(19)
         subitemEventCount.should.equal(13)
