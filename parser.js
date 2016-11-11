@@ -81,9 +81,9 @@ XmlParser.prototype.parse = function (chunk) {
       processError(err)
     })
 
-    parser.on('end', function () {
+    /* parser.on('end', function () {
       scope.emit('end')
-    })
+    })*/
   }
 
   function processError (err) {
