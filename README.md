@@ -81,7 +81,7 @@ npm install xml-streamer
   })
 }())
 
-// 2. By passing the resourcePath as shown in 2 method and reading data by calling `read` method instead listening for data events.
+// 3. By passing the resourcePath as shown in 2 method and reading data by calling `read` method instead listening for data events.
 
 (function () {
   "use strict";
@@ -144,6 +144,7 @@ npm install xml-streamer
            if you are interested in `subitem` nodes then resourcePath would be: `/items/item/subitem`
            if you are interested in `items` nodes then resourcePath would be: `/items`
 
+
 * `emitOnNodeName`: `Type: Boolean` Optional field. Set this to true if you want to listen on node names instead of data event. `default: false`
             
             // Ex: consider the above XML snippet
@@ -162,7 +163,8 @@ npm install xml-streamer
              ```
 
                 `NOTE:` when you set `emitOnNodeName:true` "data" events are emitted normally. So make sure you don't listen for both the events.
-  
+
+
 * `attrsKey`: `Type: String` Optional field. pass the value with which you want to reference attributes of a node in its object form. `default: '$'`
                   
 * `textKey`: `Type: String` Optional field. pass the value with which you want to reference node value in its object form. `default: '_'`
