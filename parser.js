@@ -17,8 +17,6 @@ function XmlParser (opts) {
   // var transformOpts = { readableObjectMode: true }
   stream.Transform.call(this)
   this._readableState.objectMode = true
-  var scope = this
-  process.nextTick(function () { scope.checkForInterestedNodeListeners() })
 }
 util.inherits(XmlParser, stream.Transform)
 
@@ -34,6 +32,7 @@ XmlParser.prototype.checkForInterestedNodeListeners = function () {
 
 XmlParser.prototype._transform = function (chunk, encoding, callback) {
   if (encoding !== 'buffer') this.emit('error', new Error('unsupported encoding'))
+  if (this.parserState.isRootNode) this.checkForInterestedNodeListeners()
 
   this.parse(chunk)
   callback()
@@ -148,7 +147,7 @@ XmlParser.prototype.parse = function (chunk) {
     var index
     var xpath
     var pathTokens
-    // console.log('***************inside emitInterestedNode name=', name)
+
     xpath = state.currentPath.substring(1)
     pathTokens = xpath.split('/')
     pathTokens.push(name)
@@ -160,7 +159,6 @@ XmlParser.prototype.parse = function (chunk) {
     }
     if (Array.isArray(tempObj)) tempObj = tempObj[tempObj.length - 1]
     scope.emit(name, tempObj)
-    // console.log('*************pushing tempObj on name=', tempObj, name)
     scope.push(tempObj)
   }
 
@@ -244,7 +242,6 @@ XmlParser.prototype.parse = function (chunk) {
       index = temp.indexOf('/')
       if (index !== -1) temp = temp.substring(0, index)
       if (temp !== name) {
-        // console.log('****************ending the stream as root doesnt match')
         scope.end()
       }
     }
@@ -252,9 +249,7 @@ XmlParser.prototype.parse = function (chunk) {
 }
 
 XmlParser.prototype._flush = function (callback) {
-  // console.log('**************inside flush')
   this.parse('', true)
-  // console.log('**************inside flush returned from parse calling callback')
   callback()
 }
 
