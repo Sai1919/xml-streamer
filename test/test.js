@@ -1200,6 +1200,7 @@ describe('Tests', function () {
       var subitemEventCount = 0
 
       parser.on('data', function (data) {
+        console.log('**********data=', data)
         dataEventCount++
       })
 
