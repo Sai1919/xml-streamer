@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/Sai1919/xml-streamer.svg?branch=master)](https://travis-ci.org/Sai1919/xml-streamer)
 ## Motivation
 
-You use [Node.js](https://nodejs.org) for speed? You process XML streams? Then you want the fastest XML to JS parser: xml-streamer
+You use [Node.js](https://nodejs.org) for speed? You process XML streams? Then you want the fastest XML to JS parser: `xml-streamer`, based on [node-expat](https://github.com/astro/node-expat)
 
 ## Install
 
@@ -13,7 +13,45 @@ npm install xml-streamer
 
 ## Basic Usage
 
+`xml-streamer can be used in three
+ ways`
+
 ```javascript
+
+// 1. By listening for interested nodes.
+
+(function () {
+  "use strict";
+
+  var Parser = require('xml-streamer')
+  
+  var opts = {} // see `Available Constructor Options` section below.
+
+  var parser = new Parser(opts)
+  
+  parser.on('item', function (item) {
+    // consume the item object here
+  })
+  
+  parser.on('end', function () {
+    // parsing ended no more data events will be raised
+  })
+
+  parser.on('error', function (error) {
+    // error occurred
+    // NOTE: when error event emitted no end event will be emitted
+    console.error(error)
+  })
+
+  xmlStream.pipe(parser) // pipe your input xmlStream to parser.
+  // readable
+  parser.on('readable', function () {
+      // if you don't want to consume "data" on "data" events you can wait for readable event and consume data by calling parser.read() 
+  })
+}())
+
+// 2. By passing a resource path.
+
 (function () {
   "use strict";
 
@@ -32,7 +70,35 @@ npm install xml-streamer
 
   parser.on('error', function (error) {
     // error occurred
-    // NOTE: when error emit emitted no end event will be emitted
+    // NOTE: when error event emitted no end event will be emitted
+    console.error(error)
+  })
+
+  xmlStream.pipe(parser) // pipe your input xmlStream to parser.
+  // readable
+  parser.on('readable', function () {
+      // if you don't want to consume "data" on "data" events you can wait for readable event and consume data by calling parser.read() 
+  })
+}())
+
+// 2. By passing the resourcePath as shown in 2 method and reading data by calling `read` method instead listening for data events.
+
+(function () {
+  "use strict";
+
+  var Parser = require('xml-streamer')
+  
+  var opts = {resourcePath: '/items/item'}
+
+  var parser = new Parser(opts)
+  
+  parser.on('end', function () {
+    // parsing ended no more data events will be raised
+  })
+
+  parser.on('error', function (error) {
+    // error occurred
+    // NOTE: when error event emitted no end event will be emitted
     console.error(error)
   })
 
@@ -57,7 +123,7 @@ npm install xml-streamer
 
 ## Available Constructor Options
 
-* `resourcePath`: `Type: String` Manditory field. Used to extract the XML nodes that you are interested in. 
+* `resourcePath`: `Type: String` Optional field. Used to extract the XML nodes that you are interested in. 
 
             // Ex: let the XML be
                 ```xml
@@ -122,9 +188,8 @@ npm install xml-streamer
 
 ## upcoming features
 
-1. `allowing to listen on interested nodes instead of passing resourcePath in options`
-2. `handling of compressed streams`
-3. `handling of different encodings`
+1. `handling of compressed streams`
+2. `handling of different encodings`
 
 
 ## Namespace handling

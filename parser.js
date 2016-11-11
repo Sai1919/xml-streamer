@@ -14,7 +14,6 @@ function XmlParser (opts) {
   this.opts = _.defaults(opts, defaults)
   this.parserState = new ParserState()
   this.parser = new expat.Parser('UTF-8')
-  // var transformOpts = { readableObjectMode: true }
   stream.Transform.call(this)
   this._readableState.objectMode = true
 }
@@ -79,10 +78,6 @@ XmlParser.prototype.parse = function (chunk) {
     parser.on('error', function (err) {
       processError(err)
     })
-
-    /* parser.on('end', function () {
-      scope.emit('end')
-    })*/
   }
 
   function processError (err) {
