@@ -1191,7 +1191,7 @@ describe('Tests', function () {
       xmlStream.pipe(parser)
     })
 
-    it('should properly parse a medium size file with same names randomly.', function (done) {
+    it.skip('should properly parse a medium size file with same names randomly.', function (done) {
       var xmlStream = fs.createReadStream('./test/TestFiles/nodesWithSameNamesRandomly.xml')
       var parser = new ParserFactory()
 
@@ -1200,7 +1200,6 @@ describe('Tests', function () {
       var subitemEventCount = 0
 
       parser.on('data', function (data) {
-        console.log('**********data=', data)
         dataEventCount++
       })
 
@@ -1217,9 +1216,9 @@ describe('Tests', function () {
       })
 
       parser.on('end', function () {
-        console.log('dataEventCount=', dataEventCount)
-        console.log('itemEventCount=', itemEventCount)
-        console.log('subitemEventCount=', subitemEventCount)
+        // console.log('dataEventCount=', dataEventCount)
+        // console.log('itemEventCount=', itemEventCount)
+        // console.log('subitemEventCount=', subitemEventCount)
         dataEventCount.should.equal(32)
         itemEventCount.should.equal(19)
         subitemEventCount.should.equal(13)
