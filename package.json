@@ -14,7 +14,9 @@
     "xml parser",
     "xml parsing",
     "xml2js",
-    "xmltojs"
+    "xmltojs",
+    "node-expat",
+    "expat"
   ],
   "license": "MIT",
   "repository": {
