@@ -13,8 +13,7 @@ npm install xml-streamer
 
 ## Basic Usage
 
-`xml-streamer can be used in three
- ways`
+`xml-streamer can be used in four ways`
 
 ```javascript
 
@@ -106,6 +105,22 @@ npm install xml-streamer
   // readable
   parser.on('readable', function () {
       // if you don't want to consume "data" on "data" events you can wait for readable event and consume data by calling parser.read() 
+  })
+}())
+
+// 4. By passing a string or buffer to parse function
+
+(function () {
+  "use strict";
+
+  var Parser = require('xml-streamer')
+  
+  var opts = {resourcePath: '/items/item'} // resourcePath is manditory when using parse method
+
+  var parser = new Parser(opts)
+  
+  parser.parse(stringOrBuffer, function (err, data) {
+    // consume data here
   })
 }())
 

@@ -31,13 +31,53 @@ XmlParser.prototype.checkForInterestedNodeListeners = function () {
 
 XmlParser.prototype._transform = function (chunk, encoding, callback) {
   if (encoding !== 'buffer') this.emit('error', new Error('unsupported encoding'))
-  if (this.parserState.isRootNode) this.checkForInterestedNodeListeners()
 
-  this.parse(chunk)
+  this.processChunk(chunk)
   callback()
 }
 
-XmlParser.prototype.parse = function (chunk) {
+XmlParser.prototype.processChunk = function (chunk) {
+  var parser = this.parser
+  var state = this.parserState
+
+  if (state.isRootNode) {
+    this.checkForInterestedNodeListeners()
+    registerEvents.call(this)
+  }
+
+  if (typeof chunk === 'string') {
+    if (!parser.parse('', true)) processError.call(this)
+  } else {
+    if (!parser.parse(chunk.toString())) processError.call(this)
+  }
+}
+
+XmlParser.prototype.parse = function (chunk, cb) {
+  var parser = this.parser
+  var state = this.parserState
+  var error
+
+  if (state.isRootNode) {
+    this.checkForInterestedNodeListeners()
+    registerEvents.call(this)
+  }
+
+  if (typeof chunk === Buffer) chunk = chunk.toString()
+
+  this.on('error', function (err) {
+    error = err
+  })
+
+  if (!parser.parse(chunk)) {
+    error = processError.call(this)
+  }
+
+  if (error) return cb(error)
+
+  return cb(null, this._readableState.buffer)
+}
+
+function registerEvents () {
   var scope = this
   var parser = this.parser
   var state = this.parserState
@@ -47,49 +87,28 @@ XmlParser.prototype.parse = function (chunk) {
   var textKey = this.opts.textKey
   var interestedNodes = state.interestedNodes
 
-  if (state.isRootNode) registerEvents()
+  parser.on('startElement', function (name, attrs) {
+    if (state.isRootNode) validateResourcePath(name)
+    state.currentPath = state.currentPath + '/' + name
+    checkForResourcePath(name)
+    if (state.isPathfound) processStartElement(name, attrs)
+  })
 
-  if (typeof chunk === 'string') {
-    if (!parser.parse('', true)) processError()
-  } else {
-    if (!parser.parse(chunk.toString())) processError()
-  }
+  parser.on('endElement', function (name) {
+    state.lastEndedNode = name
+    lastIndex = state.currentPath.lastIndexOf('/' + name)
+    state.currentPath = state.currentPath.substring(0, lastIndex)
+    if (state.isPathfound) processEndElement(name)
+    checkForResourcePath(name)
+  })
 
-  function registerEvents () {
-    parser.on('startElement', function (name, attrs) {
-      if (state.isRootNode) validateResourcePath(name)
-      state.currentPath = state.currentPath + '/' + name
-      checkForResourcePath(name)
-      if (state.isPathfound) processStartElement(name, attrs)
-    })
+  parser.on('text', function (text) {
+    if (state.isPathfound) processText(text)
+  })
 
-    parser.on('endElement', function (name) {
-      state.lastEndedNode = name
-      lastIndex = state.currentPath.lastIndexOf('/' + name)
-      state.currentPath = state.currentPath.substring(0, lastIndex)
-      if (state.isPathfound) processEndElement(name)
-      checkForResourcePath(name)
-    })
-
-    parser.on('text', function (text) {
-      if (state.isPathfound) processText(text)
-    })
-
-    parser.on('error', function (err) {
-      processError(err)
-    })
-  }
-
-  function processError (err) {
-    var error = ''
-
-    if (err) {
-      error = err
-    } else {
-      error = parser.getError()
-    }
-    scope.emit('error', new Error(error + ' at line no: ' + parser.getCurrentLineNumber()))
-  }
+  parser.on('error', function (err) {
+    processError.call(this, err)
+  })
 
   function processStartElement (name, attrs) {
     if (!name) return
@@ -243,8 +262,22 @@ XmlParser.prototype.parse = function (chunk) {
   }
 }
 
+function processError (err) {
+  var parser = this.parser
+  var error = ''
+
+  if (err) {
+    error = err
+  } else {
+    error = parser.getError()
+  }
+  error = new Error(error + ' at line no: ' + parser.getCurrentLineNumber())
+  this.emit('error', error)
+  return error
+}
+
 XmlParser.prototype._flush = function (callback) {
-  this.parse('', true)
+  this.processChunk('')
   callback()
 }
 

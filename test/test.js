@@ -1227,4 +1227,87 @@ describe('Tests', function () {
       xmlStream.pipe(parser)
     })
   })
+
+  describe('Parse funtion should work properly', function () {
+    it('should properly parse a simple file.', function (done) {
+      var xml = fs.readFileSync('./test/TestFiles/item.xml')
+      var parser = new ParserFactory({resourcePath: '/items/item'})
+      var expectedData = [
+                           { '$': { id: '1', test: 'hello' },
+                             subitem:
+                             [ { '$': { sub: 'TESTING SUB' }, _: 'one' },
+                                  { '$': { sub: '2' }, _: 'two' } ] },
+                              { '$': { id: '2' },
+                                subitem: [ { _: 'three' }, { _: 'four' }, { _: 'five' } ] } ]
+
+      parser.parse(xml.toString(), function (err, data) {
+        if (err) done(err)
+        data.should.deepEqual(expectedData)
+        done()
+      })
+    })
+
+    it('should properly parse a medium size file.', function (done) {
+      var xml = fs.readFileSync('./test/TestFiles/medium.xml')
+      var parser = new ParserFactory({resourcePath: '/items/item'})
+
+      parser.parse(xml, function (err, data) {
+        if (err) done(err)
+        data.length.should.equal(10)
+        done()
+      })
+    })
+
+    it('should properly parse a file containing many nodes.', function (done) {
+      var xml = fs.readFileSync('./test/TestFiles/manyItems.xml')
+      var parser = new ParserFactory({resourcePath: '/items/item'})
+
+      parser.parse(xml, function (err, data) {
+        if (err) done(err)
+        data.length.should.equal(296)
+        done()
+      })
+    })
+
+    it('should properly parse a xml simple file in which nodes contain text values randomly.', function (done) {
+      var xml = fs.readFileSync('./test/TestFiles/randomText.xml')
+      var parser = new ParserFactory({resourcePath: '/items/item'})
+      var expectedData = [ { '$': { 'id': '1', 'test': 'hello' }, '_': ' item  one  two',
+                             'subitem': [ { '$': { 'sub': 'TESTING SUB' }, '_': 'one' },
+                                          { '$': { 'sub': '2' }, '_': 'two' } ] },
+                           { '$': { 'id': '2' }, '_': ' item  one two three  four',
+                             'subitem': [ { '_': 'three' }, { '_': 'four' }, { '_': 'five' } ] }
+                         ]
+
+      parser.parse(xml, function (err, data) {
+        if (err) done(err)
+        data.should.deepEqual(expectedData)
+        data.length.should.equal(2)
+        done()
+      })
+    })
+
+    it('should properly parse a huge file.', function (done) {
+      var xml = fs.readFileSync('./test/TestFiles/hugeFile.xml')
+      var parser = new ParserFactory({resourcePath: '/items/item'})
+      // console.log(parser)
+      parser.parse(xml, function (err, data) {
+        if (err) done(err)
+        data.length.should.equal(2072)
+        done()
+      })
+    })
+
+    it('should properly return error if the xml file is corrupted.', function (done) {
+      var xml = fs.readFileSync('./test/TestFiles/corrupted.xml')
+      var parser = new ParserFactory({resourcePath: '/items/item'})
+
+      parser.parse(xml, function (err, data) {
+        // console.log(err)
+        err.message.should.equal('mismatched tag at line no: 11')
+        should(data).not.be.ok()
+        done()
+      })
+    })
+  })
 })
