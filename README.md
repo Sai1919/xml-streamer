@@ -16,8 +16,37 @@ npm install xml-streamer
 `xml-streamer can be used in four ways`
 
 ```javascript
+// 1. By passing the resourcePath and reading data by calling `read` method instead listening for data events.
 
-// 1. By listening for interested nodes.
+(function () {
+  "use strict";
+
+  var Parser = require('xml-streamer')
+  
+  var opts = {resourcePath: '/items/item'}
+
+  var parser = new Parser(opts)
+  
+  parser.on('end', function () {
+    // parsing ended no more data events will be raised
+  })
+
+  parser.on('error', function (error) {
+    // error occurred
+    // NOTE: when error event emitted no end event will be emitted
+    console.error(error)
+  })
+
+  xmlStream.pipe(parser) // pipe your input xmlStream to parser.
+  // readable
+  parser.on('readable', function () {
+     // if you don't want to consume "data" on "data" events you can wait for readable event and consume data by calling parser.read() 
+  })
+  // after readable event occured you can call read method and get data.
+  parser.read() // will return one object at a time.
+}())
+
+// 2. By listening for interested nodes.
 
 (function () {
   "use strict";
@@ -49,7 +78,7 @@ npm install xml-streamer
   })
 }())
 
-// 2. By passing a resource path.
+// 3. By passing a resource path.
 
 (function () {
   "use strict";
@@ -62,34 +91,6 @@ npm install xml-streamer
   parser.on('data', function (data) {
     // consume the data object here
   })
-  
-  parser.on('end', function () {
-    // parsing ended no more data events will be raised
-  })
-
-  parser.on('error', function (error) {
-    // error occurred
-    // NOTE: when error event emitted no end event will be emitted
-    console.error(error)
-  })
-
-  xmlStream.pipe(parser) // pipe your input xmlStream to parser.
-  // readable
-  parser.on('readable', function () {
-      // if you don't want to consume "data" on "data" events you can wait for readable event and consume data by calling parser.read() 
-  })
-}())
-
-// 3. By passing the resourcePath as shown in 2 method and reading data by calling `read` method instead listening for data events.
-
-(function () {
-  "use strict";
-
-  var Parser = require('xml-streamer')
-  
-  var opts = {resourcePath: '/items/item'}
-
-  var parser = new Parser(opts)
   
   parser.on('end', function () {
     // parsing ended no more data events will be raised
