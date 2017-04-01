@@ -203,6 +203,26 @@ npm install xml-streamer
                   ```
                      // Then set `attrsKey= "attrs"` and `textKey= "text"`
 
+* `explicitArray`: `Type: Boolean` Optional field. `Default value is true`. All children nodes will come in an array when this option is true.
+
+            // Ex: For example let the XML be
+                ```xml
+                    <?xml version="1.0" encoding="utf-8"?>
+                    <items>
+                        <item id="1" test= 'hello'>
+                            <subitem sub= "2">two</subitem>
+                        </item>
+                    </items>
+                ```
+            // if explicitArray is true and resourcePath is /items/item. 
+            // Output for above xml will be
+                ```javascript
+                        [
+                           { '$': { id: '1', test: 'hello' },
+                             subitem: { '$': { sub: '2' }, _: 'two' } },
+                        ]
+                ```
+        `caution:` When explicitArray set to false and if there are multiple children nodes with same name then last node will override all preceding nodes. 
 
 ## upcoming features
 
