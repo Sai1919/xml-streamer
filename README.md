@@ -137,6 +137,7 @@ npm install xml-streamer
 * `#resume()` resumes
 * `#read()` returns object if stream is readable
 
+
 ## Available Constructor Options
 
 * `resourcePath`: `Type: String` Optional field. Used to extract the XML nodes that you are interested in. 
@@ -161,6 +162,7 @@ npm install xml-streamer
            if you are interested in `items` nodes then resourcePath would be: `/items`
 
 
+
 * `emitOnNodeName`: `Type: Boolean` Optional field. Set this to true if you want to listen on node names instead of data event. `default: false`
             
             // Ex: consider the above XML snippet
@@ -179,6 +181,7 @@ npm install xml-streamer
              ```
 
                 `NOTE:` when you set `emitOnNodeName:true` "data" events are emitted normally. So make sure you don't listen for both the events.
+
 
 
 * `attrsKey`: `Type: String` Optional field. pass the value with which you want to reference attributes of a node in its object form. `default: '$'`
@@ -203,6 +206,7 @@ npm install xml-streamer
                   ```
                      // Then set `attrsKey= "attrs"` and `textKey= "text"`
 
+
 * `explicitArray`: `Type: Boolean` Optional field. `Default value is true`. All children nodes will come in an array when this option is true.
 
             // Ex: For example let the XML be
@@ -224,10 +228,12 @@ npm install xml-streamer
                 ```
         `caution:` When explicitArray set to false and if there are multiple children nodes with same name then last node will override all preceding nodes. 
 
+
 ## upcoming features
 
 1. `handling of compressed streams`
 2. `handling of different encodings`
+3. `Filtering of objects extracted from resourcePath based on xpaths and json paths`
 
 
 ## Namespace handling
