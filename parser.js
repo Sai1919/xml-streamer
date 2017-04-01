@@ -8,8 +8,10 @@ var defaults = {
   resourcePath: '',
   emitOnNodeName: false,
   attrsKey: '$',
-  textKey: '_'
+  textKey: '_',
+  explicitArray: true
 }
+
 function XmlParser (opts) {
   this.opts = _.defaults(opts, defaults)
   this.parserState = new ParserState()
@@ -86,6 +88,7 @@ function registerEvents () {
   var attrsKey = this.opts.attrsKey
   var textKey = this.opts.textKey
   var interestedNodes = state.interestedNodes
+  var explicitArray = this.opts.explicitArray
 
   parser.on('startElement', function (name, attrs) {
     if (state.isRootNode) validateResourcePath(name)
@@ -124,15 +127,20 @@ function registerEvents () {
     var tokens = path.split('.')
 
     for (var i = 0; i < tokens.length; i++) {
-      if (tempObj[tokens[i]]) {
+      if (tempObj[tokens[i]] && !(explicitArray === false && i === tokens.length - 1)) {
         tempObj = tempObj[tokens[i]]
       } else {
-        tempObj[tokens[i]] = []
+        // if explicitArray is true then create each node as array
+        // irrespective of how many nodes are there with same name.
+        tempObj[tokens[i]] = explicitArray ? [] : obj
         tempObj = tempObj[tokens[i]]
       }
       if (Array.isArray(tempObj) && i !== tokens.length - 1) tempObj = tempObj[tempObj.length - 1]
     }
-    tempObj.push(obj)
+
+    if (Array.isArray(tempObj)) {
+      tempObj.push(obj)
+    }
   }
 
   function processEndElement (name) {
@@ -192,14 +200,20 @@ function registerEvents () {
       if (tempObj[tokens[i]]) {
         tempObj = tempObj[tokens[i]]
       } else {
-        tempObj[tokens[i]] = []
+        tempObj[tokens[i]] = explicitArray ? [] : {}
         tempObj = tempObj[tokens[i]]
       }
       if (Array.isArray(tempObj) && i !== tokens.length - 1) tempObj = tempObj[tempObj.length - 1]
     }
-    var obj = tempObj[tempObj.length - 1]
-    if (!obj[textKey]) obj[textKey] = ''
-    obj[textKey] = obj[textKey] + text
+
+    if (Array.isArray(tempObj)) {
+      var obj = tempObj[tempObj.length - 1]
+      if (!obj[textKey]) obj[textKey] = ''
+      obj[textKey] = obj[textKey] + text
+    } else {
+      if (!tempObj[textKey]) tempObj[textKey] = ''
+      tempObj[textKey] = tempObj[textKey] + text
+    }
   }
 
   function checkForResourcePath (name) {
