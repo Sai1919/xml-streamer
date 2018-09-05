@@ -91,7 +91,7 @@ function registerEvents () {
   var explicitArray = this.opts.explicitArray
 
   parser.on('startElement', function (name, attrs) {
-    if (state.isRootNode) validateResourcePath(name)
+    if (state.isRootNode) state.isRootNode = false;
     state.currentPath = state.currentPath + '/' + name
     checkForResourcePath(name)
     if (state.isPathfound) processStartElement(name, attrs)
@@ -253,26 +253,6 @@ function registerEvents () {
       jsonPath = tokens.join('.')
     }
     return jsonPath
-  }
-
-  function validateResourcePath (name) {
-    var temp
-    var index
-
-    state.isRootNode = false
-
-    if (resourcePath) {
-      if (resourcePath[0] === '/') {
-        temp = resourcePath.substring(1, resourcePath.length)
-      } else {
-        temp = resourcePath
-      }
-      index = temp.indexOf('/')
-      if (index !== -1) temp = temp.substring(0, index)
-      if (temp !== name) {
-        scope.end()
-      }
-    }
   }
 }
 
