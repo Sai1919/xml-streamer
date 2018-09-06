@@ -228,6 +228,34 @@ npm install xml-streamer
                 ```
         `caution:` When explicitArray set to false and if there are multiple children nodes with same name then last node will override all preceding nodes. 
 
+* `verbatimText`: `Type: Boolean` Optional field. `Default value is false`. When set, text attribute will include all blanks found in xml. When unset, blanks are removed as long as they come in one expat single block (blank lines, newlines and entities).
+
+            // Ex: For example let the XML be
+                ```xml
+                    <?xml version="1.0" encoding="utf-8"?>
+                    <items>
+                        <item>
+                This is
+                a test
+                        </item>
+                    </items>
+                ```
+            // if verbatimText is true and resourcePath is /items/item.
+            // Output for above xml will be
+                ```javascript
+                        [
+                           { '_' : "\nThis is\na test\n            "}
+                        ]
+                ```
+
+            // if verbatimText is false and resourcePath is /items/item.
+            // Output for above xml will be
+                ```javascript
+                        [
+                           { '_' : "This isa test"}
+                        ]
+                ```
+
 
 ## upcoming features
 

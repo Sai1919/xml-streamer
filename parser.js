@@ -9,7 +9,8 @@ var defaults = {
   emitOnNodeName: false,
   attrsKey: '$',
   textKey: '_',
-  explicitArray: true
+  explicitArray: true,
+  verbatimText: false
 }
 
 function XmlParser (opts) {
@@ -89,6 +90,7 @@ function registerEvents () {
   var textKey = this.opts.textKey
   var interestedNodes = state.interestedNodes
   var explicitArray = this.opts.explicitArray
+  var verbatimText = this.opts.verbatimText;
 
   parser.on('startElement', function (name, attrs) {
     if (state.isRootNode) validateResourcePath(name)
@@ -185,7 +187,7 @@ function registerEvents () {
   }
 
   function processText (text) {
-    if (!text || !/\S/.test(text)) {
+    if ((!text) || ((!verbatimText) && !/\S/.test(text))) {
       return
     }
     var path = getRelativePath()
