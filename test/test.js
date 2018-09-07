@@ -115,6 +115,37 @@ describe('Tests', function () {
       xmlStream.pipe(parser)
     })
 
+    it('reads tons of multibyte characters.', function(done) {
+      var xmlStream = fs.createReadStream('./test/TestFiles/bigUtf8.xml', { highWaterMark: 1024})
+      var parser = new ParserFactory({resourcePath: '/items/item'})
+
+      const dummyText = ('à'.repeat(120)+'+').repeat(110);
+      var expectedData = [
+                           { _: dummyText
+                           } ]
+      var actualData = []
+      var dataEventCount = 0
+
+      parser.on('data', function (data) {
+        actualData.push(data)
+        dataEventCount++
+      })
+
+      parser.on('error', function (err) {
+        should(err).not.be.ok()
+        done(err)
+      })
+
+      parser.on('end', function () {
+        // console.log('actualData=', actualData)
+        // console.log('dataEventCount=', dataEventCount)
+        actualData.should.deepEqual(expectedData)
+        dataEventCount.should.equal(1)
+        done()
+      })
+      xmlStream.pipe(parser)
+    });
+
     it('should properly parse a huge file.', function (done) {
       var xmlStream = fs.createReadStream('./test/TestFiles/hugeFile.xml')
       var parser = new ParserFactory({resourcePath: '/items/item'})
