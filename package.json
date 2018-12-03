@@ -25,7 +25,7 @@
   },
   "dependencies": {
     "node-expat": "2.3.15",
-    "lodash": "4.16.6"
+    "lodash": "4.17.5"
   },
   "devDependencies": {
     "mocha": "^1.21.4",
