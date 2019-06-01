@@ -77,7 +77,7 @@ XmlParser.prototype.parse = function (chunk, cb) {
 
   if (error) return cb(error)
 
-  return cb(null, this._readableState.buffer)
+  return cb(null, readBuffer(this._readableState.buffer))
 }
 
 function registerEvents () {
@@ -270,6 +270,19 @@ function processError (err) {
   error = new Error(error + ' at line no: ' + parser.getCurrentLineNumber())
   this.emit('error', error)
   return error
+}
+
+function readBuffer (buffer) {
+  if (!buffer) return undefined
+
+  var head = buffer.head
+  var data = []
+
+  while (head) {
+    data.push(head.data)
+    head = head.next
+  }
+  return data
 }
 
 XmlParser.prototype._flush = function (callback) {

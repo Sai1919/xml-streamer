@@ -1191,7 +1191,7 @@ describe('Tests', function () {
       xmlStream.pipe(parser)
     })
 
-    it.skip('should properly parse a medium size file with same names randomly.', function (done) {
+    it('should properly parse a medium size file with same names randomly.', function (done) {
       var xmlStream = fs.createReadStream('./test/TestFiles/nodesWithSameNamesRandomly.xml')
       var parser = new ParserFactory()
 
