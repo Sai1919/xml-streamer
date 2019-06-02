@@ -65,7 +65,7 @@ XmlParser.prototype.parse = function (chunk, cb) {
     registerEvents.call(this)
   }
 
-  if (typeof chunk === Buffer) chunk = chunk.toString()
+  if (chunk instanceof Buffer) chunk = chunk.toString()
 
   this.on('error', function (err) {
     error = err
@@ -77,7 +77,7 @@ XmlParser.prototype.parse = function (chunk, cb) {
 
   if (error) return cb(error)
 
-  return cb(null, this._readableState.buffer)
+  return cb(null, readBuffer(this._readableState.buffer))
 }
 
 function registerEvents () {
@@ -90,10 +90,10 @@ function registerEvents () {
   var textKey = this.opts.textKey
   var interestedNodes = state.interestedNodes
   var explicitArray = this.opts.explicitArray
-  var verbatimText = this.opts.verbatimText;
+  var verbatimText = this.opts.verbatimText
 
   parser.on('startElement', function (name, attrs) {
-    if (state.isRootNode) state.isRootNode = false;
+    if (state.isRootNode) state.isRootNode = false
     state.currentPath = state.currentPath + '/' + name
     checkForResourcePath(name)
     if (state.isPathfound) processStartElement(name, attrs)
@@ -272,10 +272,22 @@ function processError (err) {
   return error
 }
 
+function readBuffer (buffer) {
+  if (!buffer) return undefined
+
+  var head = buffer.head
+  var data = []
+
+  while (head) {
+    data.push(head.data)
+    head = head.next
+  }
+  return data
+}
+
 XmlParser.prototype._flush = function (callback) {
   this.processChunk('')
   callback()
 }
 
 module.exports = XmlParser
-
