@@ -1,3 +1,4 @@
+var { StringDecoder } = require('string_decoder');
 var expat = require('node-expat')
 var _ = require('lodash')
 var util = require('util')
@@ -19,6 +20,7 @@ function XmlParser (opts) {
   this.parser = new expat.Parser('UTF-8')
   stream.Transform.call(this)
   this._readableState.objectMode = true
+  this.stringDecoder = new StringDecoder('utf8');
 }
 util.inherits(XmlParser, stream.Transform)
 
@@ -34,7 +36,7 @@ XmlParser.prototype.checkForInterestedNodeListeners = function () {
 
 XmlParser.prototype._transform = function (chunk, encoding, callback) {
   if (encoding !== 'buffer') this.emit('error', new Error('unsupported encoding'))
-
+  
   this.processChunk(chunk)
   callback()
 }
@@ -49,9 +51,11 @@ XmlParser.prototype.processChunk = function (chunk) {
   }
 
   if (typeof chunk === 'string') {
-    if (!parser.parse('', true)) processError.call(this)
+    var toWrite = this.stringDecoder.end()
+    if (!parser.parse(toWrite, true)) processError.call(this)
   } else {
-    if (!parser.parse(chunk.toString())) processError.call(this)
+    var toWrite = this.stringDecoder.write(chunk);
+    if (toWrite.length && !parser.parse(toWrite)) processError.call(this)
   }
 }
 
@@ -71,7 +75,8 @@ XmlParser.prototype.parse = function (chunk, cb) {
     error = err
   })
 
-  if (!parser.parse(chunk)) {
+  var toWrite = this.stringDecoder.write(chunk);
+  if (toWrite.length && !parser.parse(toWrite)) {
     error = processError.call(this)
   }
 
