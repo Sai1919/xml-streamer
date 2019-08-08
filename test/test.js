@@ -11,12 +11,12 @@ describe('Tests', function () {
       var xmlStream = fs.createReadStream('./test/TestFiles/item.xml')
       var parser = new ParserFactory({ resourcePath: '/items/item' })
       var expectedData = [
-        { '$': { id: '1', test: 'hello' },
+        { $: { id: '1', test: 'hello' },
           subitem:
-                             [ { '$': { sub: 'TESTING SUB' }, _: 'one' },
-                               { '$': { sub: '2' }, _: 'two' } ] },
-        { '$': { id: '2' },
-          subitem: [ { _: 'three' }, { _: 'four' }, { _: 'five' } ] } ]
+                             [{ $: { sub: 'TESTING SUB' }, _: 'one' },
+                               { $: { sub: '2' }, _: 'two' }] },
+        { $: { id: '2' },
+          subitem: [{ _: 'three' }, { _: 'four' }, { _: 'five' }] }]
       var actualData = []
       var dataEventCount = 0
 
@@ -87,13 +87,13 @@ describe('Tests', function () {
     it('should properly parse a xml simple file in which nodes contain text values randomly.', function (done) {
       var xmlStream = fs.createReadStream('./test/TestFiles/randomText.xml')
       var parser = new ParserFactory({ resourcePath: '/items/item' })
-      var expectedData = [ { '$': { 'id': '1', 'test': 'hello' },
-        '_': ' item  one  two',
-        'subitem': [ { '$': { 'sub': 'TESTING SUB' }, '_': 'one' },
-          { '$': { 'sub': '2' }, '_': 'two' } ] },
-      { '$': { 'id': '2' },
-        '_': ' item  one two three  four',
-        'subitem': [ { '_': 'three' }, { '_': 'four' }, { '_': 'five' } ] }
+      var expectedData = [{ $: { id: '1', test: 'hello' },
+        _: ' item  one  two',
+        subitem: [{ $: { sub: 'TESTING SUB' }, _: 'one' },
+          { $: { sub: '2' }, _: 'two' }] },
+      { $: { id: '2' },
+        _: ' item  one two three  four',
+        subitem: [{ _: 'three' }, { _: 'four' }, { _: 'five' }] }
       ]
       var actualData = []
       var dataEventCount = 0
@@ -124,7 +124,7 @@ describe('Tests', function () {
       const dummyText = ('à'.repeat(120) + '+').repeat(110)
       var expectedData = [
         { _: dummyText
-        } ]
+        }]
       var actualData = []
       var dataEventCount = 0
 
@@ -175,12 +175,12 @@ describe('Tests', function () {
       var xmlStream = fs.createReadStream('./test/TestFiles/item.xml')
       var parser = new ParserFactory({ resourcePath: '/items/item' })
       var expectedData = [
-        { '$': { id: '1', test: 'hello' },
+        { $: { id: '1', test: 'hello' },
           subitem:
-                             [ { '$': { sub: 'TESTING SUB' }, _: 'one' },
-                               { '$': { sub: '2' }, _: 'two' } ] },
-        { '$': { id: '2' },
-          subitem: [ { _: 'three' }, { _: 'four' }, { _: 'five' } ] } ]
+                             [{ $: { sub: 'TESTING SUB' }, _: 'one' },
+                               { $: { sub: '2' }, _: 'two' }] },
+        { $: { id: '2' },
+          subitem: [{ _: 'three' }, { _: 'four' }, { _: 'five' }] }]
       var actualData = []
       var dataEventCount = 0
       var isSetTimeoutHappened = true
@@ -247,12 +247,12 @@ describe('Tests', function () {
       var xmlStream = fs.createReadStream('./test/TestFiles/item.xml')
       var parser = new ParserFactory({ resourcePath: '/items/item' })
       var expectedData = [
-        { '$': { id: '1', test: 'hello' },
+        { $: { id: '1', test: 'hello' },
           subitem:
-                             [ { '$': { sub: 'TESTING SUB' }, _: 'one' },
-                               { '$': { sub: '2' }, _: 'two' } ] },
-        { '$': { id: '2' },
-          subitem: [ { _: 'three' }, { _: 'four' }, { _: 'five' } ] } ]
+                             [{ $: { sub: 'TESTING SUB' }, _: 'one' },
+                               { $: { sub: '2' }, _: 'two' }] },
+        { $: { id: '2' },
+          subitem: [{ _: 'three' }, { _: 'four' }, { _: 'five' }] }]
       var actualData = []
       var dataEventCount = 0
 
@@ -279,12 +279,12 @@ describe('Tests', function () {
       var xmlStream = fs.createReadStream('./test/TestFiles/item.xml')
       var parser = new ParserFactory({ resourcePath: '/items/item', attrsKey: 'attrs', textKey: 'text' })
       var expectedData = [
-        { 'attrs': { id: '1', test: 'hello' },
+        { attrs: { id: '1', test: 'hello' },
           subitem:
-                             [ { 'attrs': { sub: 'TESTING SUB' }, text: 'one' },
-                               { 'attrs': { sub: '2' }, text: 'two' } ] },
-        { 'attrs': { id: '2' },
-          subitem: [ { text: 'three' }, { text: 'four' }, { text: 'five' } ] } ]
+                             [{ attrs: { sub: 'TESTING SUB' }, text: 'one' },
+                               { attrs: { sub: '2' }, text: 'two' }] },
+        { attrs: { id: '2' },
+          subitem: [{ text: 'three' }, { text: 'four' }, { text: 'five' }] }]
       var actualData = []
       var dataEventCount = 0
 
@@ -313,10 +313,10 @@ describe('Tests', function () {
       var expectedData = [
         { '!': { id: '1', test: 'hello' },
           subitem:
-                             [ { '!': { sub: 'TESTING SUB' }, '%': 'one' },
-                               { '!': { sub: '2' }, '%': 'two' } ] },
+                             [{ '!': { sub: 'TESTING SUB' }, '%': 'one' },
+                               { '!': { sub: '2' }, '%': 'two' }] },
         { '!': { id: '2' },
-          subitem: [ { '%': 'three' }, { '%': 'four' }, { '%': 'five' } ] } ]
+          subitem: [{ '%': 'three' }, { '%': 'four' }, { '%': 'five' }] }]
       var actualData = []
       var dataEventCount = 0
 
@@ -402,12 +402,12 @@ describe('Tests', function () {
       var xmlStream = fs.createReadStream('./test/TestFiles/item.xml')
       var parser = new ParserFactory({ resourcePath: '/items/item' })
       var expectedData = [
-        { '$': { id: '1', test: 'hello' },
+        { $: { id: '1', test: 'hello' },
           subitem:
-                             [ { '$': { sub: 'TESTING SUB' }, _: 'one' },
-                               { '$': { sub: '2' }, _: 'two' } ] },
-        { '$': { id: '2' },
-          subitem: [ { _: 'three' }, { _: 'four' }, { _: 'five' } ] } ]
+                             [{ $: { sub: 'TESTING SUB' }, _: 'one' },
+                               { $: { sub: '2' }, _: 'two' }] },
+        { $: { id: '2' },
+          subitem: [{ _: 'three' }, { _: 'four' }, { _: 'five' }] }]
       var actualData = []
       var obj
       var Timeout
@@ -454,6 +454,7 @@ describe('Tests', function () {
 
       parser.on('end', function () {
         // console.log(objCount)
+        endEventOcurred = true
         objCount.should.deepEqual(296)
         done()
       })
@@ -481,6 +482,7 @@ describe('Tests', function () {
 
       parser.on('end', function () {
         // console.log(objCount)
+        endEventOcurred = true
         objCount.should.deepEqual(2072)
         done()
       })
@@ -557,12 +559,12 @@ describe('Tests', function () {
       var xmlStream = fs.createReadStream('./test/TestFiles/item.xml')
       var parser = new ParserFactory({ resourcePath: '/items/item', emitOnNodeName: true })
       var expectedData = [
-        { '$': { id: '1', test: 'hello' },
+        { $: { id: '1', test: 'hello' },
           subitem:
-                             [ { '$': { sub: 'TESTING SUB' }, _: 'one' },
-                               { '$': { sub: '2' }, _: 'two' } ] },
-        { '$': { id: '2' },
-          subitem: [ { _: 'three' }, { _: 'four' }, { _: 'five' } ] } ]
+                             [{ $: { sub: 'TESTING SUB' }, _: 'one' },
+                               { $: { sub: '2' }, _: 'two' }] },
+        { $: { id: '2' },
+          subitem: [{ _: 'three' }, { _: 'four' }, { _: 'five' }] }]
       var actualData = []
       var itemData = []
       var dataEventCount = 0
@@ -777,33 +779,33 @@ describe('Tests', function () {
 
       var expectedData =
         [
-          { '$': { sub: 'TESTING SUB' }, _: 'one' },
-          { '$': { sub: '2' }, _: 'two' },
-          { '$': { id: '1', test: 'hello' },
-            subitem: [ { '$': { sub: 'TESTING SUB' }, _: 'one' },
-              { '$': { sub: '2' }, _: 'two' } ]
+          { $: { sub: 'TESTING SUB' }, _: 'one' },
+          { $: { sub: '2' }, _: 'two' },
+          { $: { id: '1', test: 'hello' },
+            subitem: [{ $: { sub: 'TESTING SUB' }, _: 'one' },
+              { $: { sub: '2' }, _: 'two' }]
           },
           { _: 'three' },
           { _: 'four' },
           { _: 'five' },
-          { '$': { id: '2' },
-            subitem: [ { _: 'three' }, { _: 'four' }, { _: 'five' } ] }
+          { $: { id: '2' },
+            subitem: [{ _: 'three' }, { _: 'four' }, { _: 'five' }] }
         ]
 
       var actualData = []
       var dataEventCount = 0
       var expectedItems = [
-        { '$': { id: '1', test: 'hello' },
+        { $: { id: '1', test: 'hello' },
           subitem:
-                             [ { '$': { sub: 'TESTING SUB' }, _: 'one' },
-                               { '$': { sub: '2' }, _: 'two' } ] },
-        { '$': { id: '2' },
-          subitem: [ { _: 'three' }, { _: 'four' }, { _: 'five' } ] } ]
+                             [{ $: { sub: 'TESTING SUB' }, _: 'one' },
+                               { $: { sub: '2' }, _: 'two' }] },
+        { $: { id: '2' },
+          subitem: [{ _: 'three' }, { _: 'four' }, { _: 'five' }] }]
       var actualItems = []
       var actualSubitems = []
       var expectedSubitems = [
-        { '$': { sub: 'TESTING SUB' }, _: 'one' },
-        { '$': { sub: '2' }, _: 'two' },
+        { $: { sub: 'TESTING SUB' }, _: 'one' },
+        { $: { sub: '2' }, _: 'two' },
         { _: 'three' },
         { _: 'four' },
         { _: 'five' }
@@ -919,34 +921,34 @@ describe('Tests', function () {
       var parser = new ParserFactory()
       var expectedData =
         [
-          { '$': { sub: 'TESTING SUB' }, _: 'one' },
-          { '$': { sub: '2' }, _: 'two' },
-          { '$': { id: '1', test: 'hello' },
+          { $: { sub: 'TESTING SUB' }, _: 'one' },
+          { $: { sub: '2' }, _: 'two' },
+          { $: { id: '1', test: 'hello' },
             _: ' item  one  two',
-            subitem: [ { '$': { sub: 'TESTING SUB' }, _: 'one' },
-              { '$': { sub: '2' }, _: 'two' } ]
+            subitem: [{ $: { sub: 'TESTING SUB' }, _: 'one' },
+              { $: { sub: '2' }, _: 'two' }]
           },
           { _: 'three' },
           { _: 'four' },
           { _: 'five' },
-          { '$': { id: '2' },
-            '_': ' item  one two three  four',
-            subitem: [ { _: 'three' }, { _: 'four' }, { _: 'five' } ] }
+          { $: { id: '2' },
+            _: ' item  one two three  four',
+            subitem: [{ _: 'three' }, { _: 'four' }, { _: 'five' }] }
         ]
       var expectedItems = [
-        { '$': { id: '1', test: 'hello' },
+        { $: { id: '1', test: 'hello' },
           _: ' item  one  two',
           subitem:
-                             [ { '$': { sub: 'TESTING SUB' }, _: 'one' },
-                               { '$': { sub: '2' }, _: 'two' } ] },
-        { '$': { id: '2' },
-          '_': ' item  one two three  four',
-          subitem: [ { _: 'three' }, { _: 'four' }, { _: 'five' } ] } ]
+                             [{ $: { sub: 'TESTING SUB' }, _: 'one' },
+                               { $: { sub: '2' }, _: 'two' }] },
+        { $: { id: '2' },
+          _: ' item  one two three  four',
+          subitem: [{ _: 'three' }, { _: 'four' }, { _: 'five' }] }]
       var actualItems = []
       var actualSubitems = []
       var expectedSubitems = [
-        { '$': { sub: 'TESTING SUB' }, _: 'one' },
-        { '$': { sub: '2' }, _: 'two' },
+        { $: { sub: 'TESTING SUB' }, _: 'one' },
+        { $: { sub: '2' }, _: 'two' },
         { _: 'three' },
         { _: 'four' },
         { _: 'five' }
@@ -1031,13 +1033,13 @@ describe('Tests', function () {
       var xmlStream = fs.createReadStream('./test/TestFiles/item.xml')
       var parser = new ParserFactory()
       var expectedData =
-        [{ 'item': [{ '$': { 'id': '1', 'test': 'hello' },
-          'subitem': [{ '$': { 'sub': 'TESTING SUB' }, '_': 'one' },
-            { '$': { 'sub': '2' }, '_': 'two' }]
+        [{ item: [{ $: { id: '1', test: 'hello' },
+          subitem: [{ $: { sub: 'TESTING SUB' }, _: 'one' },
+            { $: { sub: '2' }, _: 'two' }]
         },
-        { '$': { 'id': '2' },
-          'subitem': [{ '_': 'three' }, { '_': 'four' },
-            { '_': 'five' }]
+        { $: { id: '2' },
+          subitem: [{ _: 'three' }, { _: 'four' },
+            { _: 'five' }]
         }]
         }]
 
@@ -1273,12 +1275,12 @@ describe('Tests', function () {
       var xml = fs.readFileSync('./test/TestFiles/item.xml')
       var parser = new ParserFactory({ resourcePath: '/items/item' })
       var expectedData = [
-        { '$': { id: '1', test: 'hello' },
+        { $: { id: '1', test: 'hello' },
           subitem:
-                             [ { '$': { sub: 'TESTING SUB' }, _: 'one' },
-                               { '$': { sub: '2' }, _: 'two' } ] },
-        { '$': { id: '2' },
-          subitem: [ { _: 'three' }, { _: 'four' }, { _: 'five' } ] } ]
+                             [{ $: { sub: 'TESTING SUB' }, _: 'one' },
+                               { $: { sub: '2' }, _: 'two' }] },
+        { $: { id: '2' },
+          subitem: [{ _: 'three' }, { _: 'four' }, { _: 'five' }] }]
 
       parser.parse(xml.toString(), function (err, data) {
         if (err) done(err)
@@ -1312,13 +1314,13 @@ describe('Tests', function () {
     it('should properly parse a xml simple file in which nodes contain text values randomly.', function (done) {
       var xml = fs.readFileSync('./test/TestFiles/randomText.xml')
       var parser = new ParserFactory({ resourcePath: '/items/item' })
-      var expectedData = [ { '$': { 'id': '1', 'test': 'hello' },
-        '_': ' item  one  two',
-        'subitem': [ { '$': { 'sub': 'TESTING SUB' }, '_': 'one' },
-          { '$': { 'sub': '2' }, '_': 'two' } ] },
-      { '$': { 'id': '2' },
-        '_': ' item  one two three  four',
-        'subitem': [ { '_': 'three' }, { '_': 'four' }, { '_': 'five' } ] }
+      var expectedData = [{ $: { id: '1', test: 'hello' },
+        _: ' item  one  two',
+        subitem: [{ $: { sub: 'TESTING SUB' }, _: 'one' },
+          { $: { sub: '2' }, _: 'two' }] },
+      { $: { id: '2' },
+        _: ' item  one two three  four',
+        subitem: [{ _: 'three' }, { _: 'four' }, { _: 'five' }] }
       ]
 
       parser.parse(xml, function (err, data) {
@@ -1358,10 +1360,10 @@ describe('Tests', function () {
       var xml = fs.readFileSync('./test/TestFiles/item.xml')
       var parser = new ParserFactory({ resourcePath: '/items/item', explicitArray: false })
       var expectedData = [
-        { '$': { id: '1', test: 'hello' },
-          subitem: { '$': { sub: '2' }, _: 'two' } },
-        { '$': { id: '2' },
-          subitem: { _: 'five' } } ]
+        { $: { id: '1', test: 'hello' },
+          subitem: { $: { sub: '2' }, _: 'two' } },
+        { $: { id: '2' },
+          subitem: { _: 'five' } }]
 
       parser.parse(xml.toString(), function (err, data) {
         if (err) done(err)
@@ -1376,119 +1378,119 @@ describe('Tests', function () {
       var parser = new ParserFactory({ resourcePath: '/items/item', explicitArray: false })
       var expectedData = [
         {
-          '$': {
-            'id': '1',
-            'test': 'hello'
+          $: {
+            id: '1',
+            test: 'hello'
           },
-          'subitem': {
-            '$': {
-              'sub': '2'
+          subitem: {
+            $: {
+              sub: '2'
             },
-            '_': 'two'
+            _: 'two'
           }
         },
         {
-          '$': {
-            'id': '2'
+          $: {
+            id: '2'
           },
-          'subitem': {
-            '_': 'five'
+          subitem: {
+            _: 'five'
           }
         },
         {
-          '$': {
-            'id': '3',
-            'test': 'hello'
+          $: {
+            id: '3',
+            test: 'hello'
           },
-          'subitem': {
-            '$': {
-              'sub': '2'
+          subitem: {
+            $: {
+              sub: '2'
             },
-            '_': 'two'
+            _: 'two'
           }
         },
         {
-          '$': {
-            'id': '4',
-            'test': 'hello'
+          $: {
+            id: '4',
+            test: 'hello'
           },
-          'subitem': {
-            '$': {
-              'sub': '2'
+          subitem: {
+            $: {
+              sub: '2'
             },
-            '_': 'two'
+            _: 'two'
           }
         },
         {
-          '$': {
-            'id': '5',
-            'test': 'hello'
+          $: {
+            id: '5',
+            test: 'hello'
           },
-          'subitem': {
-            '$': {
-              'sub': '2'
+          subitem: {
+            $: {
+              sub: '2'
             },
-            '_': 'two'
+            _: 'two'
           }
         },
         {
-          '$': {
-            'id': '6',
-            'test': 'hello'
+          $: {
+            id: '6',
+            test: 'hello'
           },
-          'subitem': {
-            '$': {
-              'sub': '2'
+          subitem: {
+            $: {
+              sub: '2'
             },
-            '_': 'two'
+            _: 'two'
           }
         },
         {
-          '$': {
-            'id': '7',
-            'test': 'hello'
+          $: {
+            id: '7',
+            test: 'hello'
           },
-          'subitem': {
-            '$': {
-              'sub': '2'
+          subitem: {
+            $: {
+              sub: '2'
             },
-            '_': 'two'
+            _: 'two'
           }
         },
         {
-          '$': {
-            'id': '8',
-            'test': 'hello'
+          $: {
+            id: '8',
+            test: 'hello'
           },
-          'subitem': {
-            '$': {
-              'sub': '2'
+          subitem: {
+            $: {
+              sub: '2'
             },
-            '_': 'two'
+            _: 'two'
           }
         },
         {
-          '$': {
-            'id': '9',
-            'test': 'hello'
+          $: {
+            id: '9',
+            test: 'hello'
           },
-          'subitem': {
-            '$': {
-              'sub': '2'
+          subitem: {
+            $: {
+              sub: '2'
             },
-            '_': 'two'
+            _: 'two'
           }
         },
         {
-          '$': {
-            'id': '10',
-            'test': 'hello'
+          $: {
+            id: '10',
+            test: 'hello'
           },
-          'subitem': {
-            '$': {
-              'sub': '2'
+          subitem: {
+            $: {
+              sub: '2'
             },
-            '_': 'two'
+            _: 'two'
           }
         }
       ]
@@ -1516,12 +1518,12 @@ describe('Tests', function () {
     it('should properly parse a xml simple file in which nodes contain text values randomly when explicitArray set to false.', function (done) {
       var xml = fs.readFileSync('./test/TestFiles/randomText.xml')
       var parser = new ParserFactory({ resourcePath: '/items/item', explicitArray: false })
-      var expectedData = [ { '$': { 'id': '1', 'test': 'hello' },
-        '_': ' item  one  two',
-        'subitem': { '$': { 'sub': '2' }, '_': 'two' } },
-      { '$': { 'id': '2' },
-        '_': ' item  one two three  four',
-        'subitem': { '_': 'five' } }
+      var expectedData = [{ $: { id: '1', test: 'hello' },
+        _: ' item  one  two',
+        subitem: { $: { sub: '2' }, _: 'two' } },
+      { $: { id: '2' },
+        _: ' item  one two three  four',
+        subitem: { _: 'five' } }
       ]
 
       parser.parse(xml, function (err, data) {
@@ -1563,7 +1565,7 @@ describe('Tests', function () {
         { '!': { id: '1', test: 'hello' },
           subitem: { '!': { sub: '2' }, '%': 'two' } },
         { '!': { id: '2' },
-          subitem: { '%': 'five' } } ]
+          subitem: { '%': 'five' } }]
       var actualData = []
       var dataEventCount = 0
 
