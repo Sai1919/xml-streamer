@@ -25,7 +25,7 @@ function XmlParser (opts) {
 util.inherits(XmlParser, stream.Transform)
 
 XmlParser.prototype.checkForInterestedNodeListeners = function () {
-  var ignore = [ 'end', 'prefinish', 'data', 'error' ]
+  var ignore = ['end', 'prefinish', 'data', 'error']
   var eventNames = Object.keys(this._events)
 
   for (var i = 0; i < eventNames.length; i++) {
