@@ -5,9 +5,6 @@
 
 You use [Node.js](https://nodejs.org) for speed? You process XML streams? Then you want the fastest XML to JS parser: `xml-streamer`, based on [node-expat](https://github.com/astro/node-expat) and It implements the Node.js `stream.Transform API`.
 
-```
-Requires Node >= 6
-```
 ## Install
 
 ```
