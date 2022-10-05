@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "2.0.0",
   "name": "xml-streamer",
   "description": "XML stream parser for parsing large files efficiently with less usage of memory.",
   "author": {
@@ -28,9 +28,9 @@
     "lodash": "4.17.21"
   },
   "devDependencies": {
-    "mocha": "6.2.0",
+    "mocha": "10.0.0",
     "should": "13.2.3",
-    "standard": "13.1.0"
+    "standard": "17.0.0"
   },
   "optionalDependencies": {},
   "main": "./parser",

@@ -1,24 +1,28 @@
-var should = require('should')
-var fs = require('fs')
-var zlib = require('zlib')
-var stream = require('stream')
+const should = require('should')
+const fs = require('fs')
+const zlib = require('zlib')
+const stream = require('stream')
 
-var ParserFactory = require('../parser')
+const ParserFactory = require('../parser')
 
 describe('Tests', function () {
   describe('Basic behaviour', function () {
     it('should properly parse a simple file.', function (done) {
-      var xmlStream = fs.createReadStream('./test/TestFiles/item.xml')
-      var parser = new ParserFactory({ resourcePath: '/items/item' })
-      var expectedData = [
-        { $: { id: '1', test: 'hello' },
+      const xmlStream = fs.createReadStream('./test/TestFiles/item.xml')
+      const parser = new ParserFactory({ resourcePath: '/items/item' })
+      const expectedData = [
+        {
+          $: { id: '1', test: 'hello' },
           subitem:
                              [{ $: { sub: 'TESTING SUB' }, _: 'one' },
-                               { $: { sub: '2' }, _: 'two' }] },
-        { $: { id: '2' },
-          subitem: [{ _: 'three' }, { _: 'four' }, { _: 'five' }] }]
-      var actualData = []
-      var dataEventCount = 0
+                               { $: { sub: '2' }, _: 'two' }]
+        },
+        {
+          $: { id: '2' },
+          subitem: [{ _: 'three' }, { _: 'four' }, { _: 'five' }]
+        }]
+      const actualData = []
+      let dataEventCount = 0
 
       parser.on('data', function (data) {
         actualData.push(data)
@@ -41,10 +45,10 @@ describe('Tests', function () {
     })
 
     it('should properly parse a medium size file.', function (done) {
-      var xmlStream = fs.createReadStream('./test/TestFiles/medium.xml')
-      var parser = new ParserFactory({ resourcePath: '/items/item' })
+      const xmlStream = fs.createReadStream('./test/TestFiles/medium.xml')
+      const parser = new ParserFactory({ resourcePath: '/items/item' })
 
-      var dataEventCount = 0
+      let dataEventCount = 0
 
       parser.on('data', function (data) {
         dataEventCount++
@@ -63,10 +67,10 @@ describe('Tests', function () {
     })
 
     it('should properly parse a file containing many nodes.', function (done) {
-      var xmlStream = fs.createReadStream('./test/TestFiles/manyItems.xml')
-      var parser = new ParserFactory({ resourcePath: '/items/item' })
+      const xmlStream = fs.createReadStream('./test/TestFiles/manyItems.xml')
+      const parser = new ParserFactory({ resourcePath: '/items/item' })
 
-      var dataEventCount = 0
+      let dataEventCount = 0
 
       parser.on('data', function (data) {
         dataEventCount++
@@ -85,18 +89,22 @@ describe('Tests', function () {
     })
 
     it('should properly parse a xml simple file in which nodes contain text values randomly.', function (done) {
-      var xmlStream = fs.createReadStream('./test/TestFiles/randomText.xml')
-      var parser = new ParserFactory({ resourcePath: '/items/item' })
-      var expectedData = [{ $: { id: '1', test: 'hello' },
+      const xmlStream = fs.createReadStream('./test/TestFiles/randomText.xml')
+      const parser = new ParserFactory({ resourcePath: '/items/item' })
+      const expectedData = [{
+        $: { id: '1', test: 'hello' },
         _: ' item  one  two',
         subitem: [{ $: { sub: 'TESTING SUB' }, _: 'one' },
-          { $: { sub: '2' }, _: 'two' }] },
-      { $: { id: '2' },
+          { $: { sub: '2' }, _: 'two' }]
+      },
+      {
+        $: { id: '2' },
         _: ' item  one two three  four',
-        subitem: [{ _: 'three' }, { _: 'four' }, { _: 'five' }] }
+        subitem: [{ _: 'three' }, { _: 'four' }, { _: 'five' }]
+      }
       ]
-      var actualData = []
-      var dataEventCount = 0
+      const actualData = []
+      let dataEventCount = 0
 
       parser.on('data', function (data) {
         actualData.push(data)
@@ -118,15 +126,14 @@ describe('Tests', function () {
     })
 
     it('reads tons of multibyte characters.', function (done) {
-      var xmlStream = fs.createReadStream('./test/TestFiles/bigUtf8.xml', { highWaterMark: 1024 })
-      var parser = new ParserFactory({ resourcePath: '/items/item' })
+      const xmlStream = fs.createReadStream('./test/TestFiles/bigUtf8.xml', { highWaterMark: 1024 })
+      const parser = new ParserFactory({ resourcePath: '/items/item' })
 
       const dummyText = ('à'.repeat(120) + '+').repeat(110)
-      var expectedData = [
-        { _: dummyText
-        }]
-      var actualData = []
-      var dataEventCount = 0
+      const expectedData = [
+        { _: dummyText }]
+      const actualData = []
+      let dataEventCount = 0
 
       parser.on('data', function (data) {
         actualData.push(data)
@@ -149,10 +156,10 @@ describe('Tests', function () {
     })
 
     it('should properly parse a huge file.', function (done) {
-      var xmlStream = fs.createReadStream('./test/TestFiles/hugeFile.xml')
-      var parser = new ParserFactory({ resourcePath: '/items/item' })
+      const xmlStream = fs.createReadStream('./test/TestFiles/hugeFile.xml')
+      const parser = new ParserFactory({ resourcePath: '/items/item' })
       // console.log(parser)
-      var dataEventCount = 0
+      let dataEventCount = 0
       parser.on('data', function (data) {
         dataEventCount++
       })
@@ -172,18 +179,22 @@ describe('Tests', function () {
 
   describe('pause and resume', function () {
     it('should properly parse a simple file.', function (done) {
-      var xmlStream = fs.createReadStream('./test/TestFiles/item.xml')
-      var parser = new ParserFactory({ resourcePath: '/items/item' })
-      var expectedData = [
-        { $: { id: '1', test: 'hello' },
+      const xmlStream = fs.createReadStream('./test/TestFiles/item.xml')
+      const parser = new ParserFactory({ resourcePath: '/items/item' })
+      const expectedData = [
+        {
+          $: { id: '1', test: 'hello' },
           subitem:
                              [{ $: { sub: 'TESTING SUB' }, _: 'one' },
-                               { $: { sub: '2' }, _: 'two' }] },
-        { $: { id: '2' },
-          subitem: [{ _: 'three' }, { _: 'four' }, { _: 'five' }] }]
-      var actualData = []
-      var dataEventCount = 0
-      var isSetTimeoutHappened = true
+                               { $: { sub: '2' }, _: 'two' }]
+        },
+        {
+          $: { id: '2' },
+          subitem: [{ _: 'three' }, { _: 'four' }, { _: 'five' }]
+        }]
+      const actualData = []
+      let dataEventCount = 0
+      let isSetTimeoutHappened = true
       this.timeout(4000)
       parser.on('data', function (data) {
         actualData.push(data)
@@ -212,11 +223,11 @@ describe('Tests', function () {
     })
 
     it('should emit data events with 1sec interval between each using pause and resume.', function (done) {
-      var xmlStream = fs.createReadStream('./test/TestFiles/medium.xml')
-      var parser = new ParserFactory({ resourcePath: '/items/item' })
+      const xmlStream = fs.createReadStream('./test/TestFiles/medium.xml')
+      const parser = new ParserFactory({ resourcePath: '/items/item' })
 
-      var dataEventCount = 0
-      var isSetTimeoutHappened = true
+      let dataEventCount = 0
+      let isSetTimeoutHappened = true
       this.timeout(20000)
       parser.on('data', function (data) {
         parser.pause()
@@ -244,17 +255,21 @@ describe('Tests', function () {
 
   describe('should respect the options passed', function () {
     it('should properly generate objects with $ as key for attrs and _ as key for text value of node.', function (done) {
-      var xmlStream = fs.createReadStream('./test/TestFiles/item.xml')
-      var parser = new ParserFactory({ resourcePath: '/items/item' })
-      var expectedData = [
-        { $: { id: '1', test: 'hello' },
+      const xmlStream = fs.createReadStream('./test/TestFiles/item.xml')
+      const parser = new ParserFactory({ resourcePath: '/items/item' })
+      const expectedData = [
+        {
+          $: { id: '1', test: 'hello' },
           subitem:
                              [{ $: { sub: 'TESTING SUB' }, _: 'one' },
-                               { $: { sub: '2' }, _: 'two' }] },
-        { $: { id: '2' },
-          subitem: [{ _: 'three' }, { _: 'four' }, { _: 'five' }] }]
-      var actualData = []
-      var dataEventCount = 0
+                               { $: { sub: '2' }, _: 'two' }]
+        },
+        {
+          $: { id: '2' },
+          subitem: [{ _: 'three' }, { _: 'four' }, { _: 'five' }]
+        }]
+      const actualData = []
+      let dataEventCount = 0
 
       parser.on('data', function (data) {
         actualData.push(data)
@@ -276,17 +291,21 @@ describe('Tests', function () {
     })
 
     it('should properly generate objects with passed attrs and text keys in the options.', function (done) {
-      var xmlStream = fs.createReadStream('./test/TestFiles/item.xml')
-      var parser = new ParserFactory({ resourcePath: '/items/item', attrsKey: 'attrs', textKey: 'text' })
-      var expectedData = [
-        { attrs: { id: '1', test: 'hello' },
+      const xmlStream = fs.createReadStream('./test/TestFiles/item.xml')
+      const parser = new ParserFactory({ resourcePath: '/items/item', attrsKey: 'attrs', textKey: 'text' })
+      const expectedData = [
+        {
+          attrs: { id: '1', test: 'hello' },
           subitem:
                              [{ attrs: { sub: 'TESTING SUB' }, text: 'one' },
-                               { attrs: { sub: '2' }, text: 'two' }] },
-        { attrs: { id: '2' },
-          subitem: [{ text: 'three' }, { text: 'four' }, { text: 'five' }] }]
-      var actualData = []
-      var dataEventCount = 0
+                               { attrs: { sub: '2' }, text: 'two' }]
+        },
+        {
+          attrs: { id: '2' },
+          subitem: [{ text: 'three' }, { text: 'four' }, { text: 'five' }]
+        }]
+      const actualData = []
+      let dataEventCount = 0
 
       parser.on('data', function (data) {
         actualData.push(data)
@@ -308,17 +327,21 @@ describe('Tests', function () {
     })
 
     it('should properly generate objects when special symbols are passed as attrs and text keys in the options.', function (done) {
-      var xmlStream = fs.createReadStream('./test/TestFiles/item.xml')
-      var parser = new ParserFactory({ resourcePath: '/items/item', attrsKey: '!', textKey: '%' })
-      var expectedData = [
-        { '!': { id: '1', test: 'hello' },
+      const xmlStream = fs.createReadStream('./test/TestFiles/item.xml')
+      const parser = new ParserFactory({ resourcePath: '/items/item', attrsKey: '!', textKey: '%' })
+      const expectedData = [
+        {
+          '!': { id: '1', test: 'hello' },
           subitem:
                              [{ '!': { sub: 'TESTING SUB' }, '%': 'one' },
-                               { '!': { sub: '2' }, '%': 'two' }] },
-        { '!': { id: '2' },
-          subitem: [{ '%': 'three' }, { '%': 'four' }, { '%': 'five' }] }]
-      var actualData = []
-      var dataEventCount = 0
+                               { '!': { sub: '2' }, '%': 'two' }]
+        },
+        {
+          '!': { id: '2' },
+          subitem: [{ '%': 'three' }, { '%': 'four' }, { '%': 'five' }]
+        }]
+      const actualData = []
+      let dataEventCount = 0
 
       parser.on('data', function (data) {
         actualData.push(data)
@@ -342,11 +365,11 @@ describe('Tests', function () {
 
   describe('should properly handle uncompressed files', function () {
     it('should properly parse a uncompressed xml file.', function (done) {
-      var xmlStream = fs.createReadStream('./test/TestFiles/medium.xml')
-      var parser = new ParserFactory({ resourcePath: '/items/item' })
-      var gzip = zlib.createGzip()
-      var gunzip = zlib.createGunzip()
-      var dataEventCount = 0
+      const xmlStream = fs.createReadStream('./test/TestFiles/medium.xml')
+      const parser = new ParserFactory({ resourcePath: '/items/item' })
+      const gzip = zlib.createGzip()
+      const gunzip = zlib.createGunzip()
+      let dataEventCount = 0
 
       parser.on('data', function (data) {
         dataEventCount++
@@ -365,13 +388,13 @@ describe('Tests', function () {
     })
 
     it('should properly parse uncompressed file and go fine with pause and resume.', function (done) {
-      var xmlStream = fs.createReadStream('./test/TestFiles/medium.xml')
-      var parser = new ParserFactory({ resourcePath: '/items/item' })
-      var gzip = zlib.createGzip()
-      var gunzip = zlib.createGunzip()
+      const xmlStream = fs.createReadStream('./test/TestFiles/medium.xml')
+      const parser = new ParserFactory({ resourcePath: '/items/item' })
+      const gzip = zlib.createGzip()
+      const gunzip = zlib.createGunzip()
 
-      var dataEventCount = 0
-      var isSetTimeoutHappened = true
+      let dataEventCount = 0
+      let isSetTimeoutHappened = true
       this.timeout(20000)
       parser.on('data', function (data) {
         parser.pause()
@@ -399,24 +422,25 @@ describe('Tests', function () {
 
   describe('read method', function () {
     it('should properly parse a simple file.', function (done) {
-      var xmlStream = fs.createReadStream('./test/TestFiles/item.xml')
-      var parser = new ParserFactory({ resourcePath: '/items/item' })
-      var expectedData = [
-        { $: { id: '1', test: 'hello' },
+      const xmlStream = fs.createReadStream('./test/TestFiles/item.xml')
+      const parser = new ParserFactory({ resourcePath: '/items/item' })
+      const expectedData = [
+        {
+          $: { id: '1', test: 'hello' },
           subitem:
                              [{ $: { sub: 'TESTING SUB' }, _: 'one' },
-                               { $: { sub: '2' }, _: 'two' }] },
-        { $: { id: '2' },
-          subitem: [{ _: 'three' }, { _: 'four' }, { _: 'five' }] }]
-      var actualData = []
-      var obj
-      var Timeout
+                               { $: { sub: '2' }, _: 'two' }]
+        },
+        {
+          $: { id: '2' },
+          subitem: [{ _: 'three' }, { _: 'four' }, { _: 'five' }]
+        }]
+      const actualData = []
+      let obj
 
       parser.on('readable', function () {
-        Timeout = setInterval(function () {
-          if ((obj = parser.read())) actualData.push(obj)
-          obj = null
-        }, 50)
+        if ((obj = parser.read())) actualData.push(obj)
+        obj = null
       })
 
       parser.on('error', function (err) {
@@ -424,9 +448,6 @@ describe('Tests', function () {
       })
 
       parser.on('end', function () {
-        // console.log('actualData=', actualData)
-        // console.log('dataEventCount=', dataEventCount)
-        clearInterval(Timeout)
         actualData.should.deepEqual(expectedData)
         done()
       })
@@ -434,10 +455,10 @@ describe('Tests', function () {
     })
 
     it('should properly parse a file containing many nodes.', function (done) {
-      var xmlStream = fs.createReadStream('./test/TestFiles/manyItems.xml')
-      var parser = new ParserFactory({ resourcePath: '/items/item' })
-      var objCount = 0
-      var endEventOcurred = false
+      const xmlStream = fs.createReadStream('./test/TestFiles/manyItems.xml')
+      const parser = new ParserFactory({ resourcePath: '/items/item' })
+      let objCount = 0
+      let endEventOcurred = false
 
       parser.on('readable', function () {
         read()
@@ -462,10 +483,10 @@ describe('Tests', function () {
     })
 
     it('should properly parse a huge.', function (done) {
-      var xmlStream = fs.createReadStream('./test/TestFiles/hugeFile.xml')
-      var parser = new ParserFactory({ resourcePath: '/items/item' })
-      var objCount = 0
-      var endEventOcurred = false
+      const xmlStream = fs.createReadStream('./test/TestFiles/hugeFile.xml')
+      const parser = new ParserFactory({ resourcePath: '/items/item' })
+      let objCount = 0
+      let endEventOcurred = false
 
       parser.on('readable', function () {
         read()
@@ -492,9 +513,9 @@ describe('Tests', function () {
 
   describe('Error Handling', function () {
     it('should properly return error if the xml file is corrupted.', function (done) {
-      var xmlStream = fs.createReadStream('./test/TestFiles/corrupted.xml')
-      var parser = new ParserFactory({ resourcePath: '/items/item' })
-      var dataEventCount = 0
+      const xmlStream = fs.createReadStream('./test/TestFiles/corrupted.xml')
+      const parser = new ParserFactory({ resourcePath: '/items/item' })
+      let dataEventCount = 0
 
       parser.on('data', function (data) {
         dataEventCount++
@@ -511,9 +532,9 @@ describe('Tests', function () {
     })
 
     it('should properly return error if the large xml file is corrupted.', function (done) {
-      var xmlStream = fs.createReadStream('./test/TestFiles/largeCorruptedFile.xml')
-      var parser = new ParserFactory({ resourcePath: '/items/item' })
-      var dataEventCount = 0
+      const xmlStream = fs.createReadStream('./test/TestFiles/largeCorruptedFile.xml')
+      const parser = new ParserFactory({ resourcePath: '/items/item' })
+      let dataEventCount = 0
 
       parser.on('data', function (data) {
         dataEventCount++
@@ -532,10 +553,10 @@ describe('Tests', function () {
 
   describe('CData and comments in xml', function () {
     it('should properly parse a simple file.', function (done) {
-      var xmlStream = fs.createReadStream('./test/TestFiles/CData-comments.xml')
-      var parser = new ParserFactory({ resourcePath: '/items/item' })
+      const xmlStream = fs.createReadStream('./test/TestFiles/CData-comments.xml')
+      const parser = new ParserFactory({ resourcePath: '/items/item' })
 
-      var dataEventCount = 0
+      let dataEventCount = 0
 
       parser.on('data', function (data) {
         dataEventCount++
@@ -556,19 +577,23 @@ describe('Tests', function () {
 
   describe('emitOnNodeName', function () {
     it('should properly emit events on node names.', function (done) {
-      var xmlStream = fs.createReadStream('./test/TestFiles/item.xml')
-      var parser = new ParserFactory({ resourcePath: '/items/item', emitOnNodeName: true })
-      var expectedData = [
-        { $: { id: '1', test: 'hello' },
+      const xmlStream = fs.createReadStream('./test/TestFiles/item.xml')
+      const parser = new ParserFactory({ resourcePath: '/items/item', emitOnNodeName: true })
+      const expectedData = [
+        {
+          $: { id: '1', test: 'hello' },
           subitem:
                              [{ $: { sub: 'TESTING SUB' }, _: 'one' },
-                               { $: { sub: '2' }, _: 'two' }] },
-        { $: { id: '2' },
-          subitem: [{ _: 'three' }, { _: 'four' }, { _: 'five' }] }]
-      var actualData = []
-      var itemData = []
-      var dataEventCount = 0
-      var itemCount = 0
+                               { $: { sub: '2' }, _: 'two' }]
+        },
+        {
+          $: { id: '2' },
+          subitem: [{ _: 'three' }, { _: 'four' }, { _: 'five' }]
+        }]
+      const actualData = []
+      const itemData = []
+      let dataEventCount = 0
+      let itemCount = 0
 
       parser.on('data', function (data) {
         actualData.push(data)
@@ -597,11 +622,11 @@ describe('Tests', function () {
     })
 
     it('should properly emit events on node names while parsing a medium size file.', function (done) {
-      var xmlStream = fs.createReadStream('./test/TestFiles/medium.xml')
-      var parser = new ParserFactory({ resourcePath: '/items/item', emitOnNodeName: true })
+      const xmlStream = fs.createReadStream('./test/TestFiles/medium.xml')
+      const parser = new ParserFactory({ resourcePath: '/items/item', emitOnNodeName: true })
 
-      var dataEventCount = 0
-      var itemCount = 0
+      let dataEventCount = 0
+      let itemCount = 0
 
       parser.on('data', function (data) {
         dataEventCount++
@@ -625,11 +650,11 @@ describe('Tests', function () {
     })
 
     it('should properly parse a file containing many nodes.', function (done) {
-      var xmlStream = fs.createReadStream('./test/TestFiles/manyItems.xml')
-      var parser = new ParserFactory({ resourcePath: '/items/item', emitOnNodeName: true })
+      const xmlStream = fs.createReadStream('./test/TestFiles/manyItems.xml')
+      const parser = new ParserFactory({ resourcePath: '/items/item', emitOnNodeName: true })
 
-      var dataEventCount = 0
-      var itemCount = 0
+      let dataEventCount = 0
+      let itemCount = 0
       parser.on('data', function (data) {
         dataEventCount++
       })
@@ -652,11 +677,11 @@ describe('Tests', function () {
     })
 
     it('should properly parse a huge file.', function (done) {
-      var xmlStream = fs.createReadStream('./test/TestFiles/hugeFile.xml')
-      var parser = new ParserFactory({ resourcePath: '/items/item', emitOnNodeName: true })
+      const xmlStream = fs.createReadStream('./test/TestFiles/hugeFile.xml')
+      const parser = new ParserFactory({ resourcePath: '/items/item', emitOnNodeName: true })
 
-      var dataEventCount = 0
-      var itemCount = 0
+      let dataEventCount = 0
+      let itemCount = 0
 
       parser.on('data', function (data) {
         dataEventCount++
@@ -682,13 +707,13 @@ describe('Tests', function () {
 
   describe('wrong resourcePath', function () {
     it('should be able to detect the wrong resourcePath at root level.', function (done) {
-      var xmlStream = fs.createReadStream('./test/TestFiles/item.xml')
-      var parser = new ParserFactory({ resourcePath: '/wrong/noNodes', emitOnNodeName: true })
+      const xmlStream = fs.createReadStream('./test/TestFiles/item.xml')
+      const parser = new ParserFactory({ resourcePath: '/wrong/noNodes', emitOnNodeName: true })
 
-      var actualData = []
-      var itemData = []
-      var dataEventCount = 0
-      var itemCount = 0
+      const actualData = []
+      const itemData = []
+      let dataEventCount = 0
+      let itemCount = 0
 
       parser.on('data', function (data) {
         actualData.push(data)
@@ -717,11 +742,11 @@ describe('Tests', function () {
     })
 
     it('should be able to detect wrong resourcePath while parsing xml', function (done) {
-      var xmlStream = fs.createReadStream('./test/TestFiles/manyItems.xml')
-      var parser = new ParserFactory({ resourcePath: '/wrong/noNodes', emitOnNodeName: true })
+      const xmlStream = fs.createReadStream('./test/TestFiles/manyItems.xml')
+      const parser = new ParserFactory({ resourcePath: '/wrong/noNodes', emitOnNodeName: true })
 
-      var dataEventCount = 0
-      var itemCount = 0
+      let dataEventCount = 0
+      let itemCount = 0
       parser.on('data', function (data) {
         dataEventCount++
       })
@@ -744,11 +769,11 @@ describe('Tests', function () {
     })
 
     it('should properly parse a huge file.', function (done) {
-      var xmlStream = fs.createReadStream('./test/TestFiles/hugeFile.xml')
-      var parser = new ParserFactory({ resourcePath: '/wrong/path', emitOnNodeName: true })
+      const xmlStream = fs.createReadStream('./test/TestFiles/hugeFile.xml')
+      const parser = new ParserFactory({ resourcePath: '/wrong/path', emitOnNodeName: true })
 
-      var dataEventCount = 0
-      var itemCount = 0
+      let dataEventCount = 0
+      let itemCount = 0
 
       parser.on('data', function (data) {
         dataEventCount++
@@ -774,36 +799,43 @@ describe('Tests', function () {
 
   describe('interested Nodes', function () {
     it('should properly parse a simple file.', function (done) {
-      var xmlStream = fs.createReadStream('./test/TestFiles/item.xml')
-      var parser = new ParserFactory()
+      const xmlStream = fs.createReadStream('./test/TestFiles/item.xml')
+      const parser = new ParserFactory()
 
-      var expectedData =
+      const expectedData =
         [
           { $: { sub: 'TESTING SUB' }, _: 'one' },
           { $: { sub: '2' }, _: 'two' },
-          { $: { id: '1', test: 'hello' },
+          {
+            $: { id: '1', test: 'hello' },
             subitem: [{ $: { sub: 'TESTING SUB' }, _: 'one' },
               { $: { sub: '2' }, _: 'two' }]
           },
           { _: 'three' },
           { _: 'four' },
           { _: 'five' },
-          { $: { id: '2' },
-            subitem: [{ _: 'three' }, { _: 'four' }, { _: 'five' }] }
+          {
+            $: { id: '2' },
+            subitem: [{ _: 'three' }, { _: 'four' }, { _: 'five' }]
+          }
         ]
 
-      var actualData = []
-      var dataEventCount = 0
-      var expectedItems = [
-        { $: { id: '1', test: 'hello' },
+      const actualData = []
+      let dataEventCount = 0
+      const expectedItems = [
+        {
+          $: { id: '1', test: 'hello' },
           subitem:
                              [{ $: { sub: 'TESTING SUB' }, _: 'one' },
-                               { $: { sub: '2' }, _: 'two' }] },
-        { $: { id: '2' },
-          subitem: [{ _: 'three' }, { _: 'four' }, { _: 'five' }] }]
-      var actualItems = []
-      var actualSubitems = []
-      var expectedSubitems = [
+                               { $: { sub: '2' }, _: 'two' }]
+        },
+        {
+          $: { id: '2' },
+          subitem: [{ _: 'three' }, { _: 'four' }, { _: 'five' }]
+        }]
+      const actualItems = []
+      const actualSubitems = []
+      const expectedSubitems = [
         { $: { sub: 'TESTING SUB' }, _: 'one' },
         { $: { sub: '2' }, _: 'two' },
         { _: 'three' },
@@ -845,12 +877,12 @@ describe('Tests', function () {
     })
 
     it('should properly parse a medium size file.', function (done) {
-      var xmlStream = fs.createReadStream('./test/TestFiles/medium.xml')
-      var parser = new ParserFactory()
+      const xmlStream = fs.createReadStream('./test/TestFiles/medium.xml')
+      const parser = new ParserFactory()
 
-      var dataEventCount = 0
-      var itemEventCount = 0
-      var subitemEventCount = 0
+      let dataEventCount = 0
+      let itemEventCount = 0
+      let subitemEventCount = 0
 
       parser.on('data', function (data) {
         dataEventCount++
@@ -881,12 +913,12 @@ describe('Tests', function () {
     })
 
     it('should properly parse a file containing many nodes.', function (done) {
-      var xmlStream = fs.createReadStream('./test/TestFiles/manyItems.xml')
-      var parser = new ParserFactory()
+      const xmlStream = fs.createReadStream('./test/TestFiles/manyItems.xml')
+      const parser = new ParserFactory()
 
-      var dataEventCount = 0
-      var itemEventCount = 0
-      var subitemEventCount = 0
+      let dataEventCount = 0
+      let itemEventCount = 0
+      let subitemEventCount = 0
 
       parser.on('data', function (data) {
         dataEventCount++
@@ -917,13 +949,14 @@ describe('Tests', function () {
     })
 
     it('should properly parse a xml simple file in which nodes contain text values randomly.', function (done) {
-      var xmlStream = fs.createReadStream('./test/TestFiles/randomText.xml')
-      var parser = new ParserFactory()
-      var expectedData =
+      const xmlStream = fs.createReadStream('./test/TestFiles/randomText.xml')
+      const parser = new ParserFactory()
+      const expectedData =
         [
           { $: { sub: 'TESTING SUB' }, _: 'one' },
           { $: { sub: '2' }, _: 'two' },
-          { $: { id: '1', test: 'hello' },
+          {
+            $: { id: '1', test: 'hello' },
             _: ' item  one  two',
             subitem: [{ $: { sub: 'TESTING SUB' }, _: 'one' },
               { $: { sub: '2' }, _: 'two' }]
@@ -931,32 +964,38 @@ describe('Tests', function () {
           { _: 'three' },
           { _: 'four' },
           { _: 'five' },
-          { $: { id: '2' },
+          {
+            $: { id: '2' },
             _: ' item  one two three  four',
-            subitem: [{ _: 'three' }, { _: 'four' }, { _: 'five' }] }
+            subitem: [{ _: 'three' }, { _: 'four' }, { _: 'five' }]
+          }
         ]
-      var expectedItems = [
-        { $: { id: '1', test: 'hello' },
+      const expectedItems = [
+        {
+          $: { id: '1', test: 'hello' },
           _: ' item  one  two',
           subitem:
                              [{ $: { sub: 'TESTING SUB' }, _: 'one' },
-                               { $: { sub: '2' }, _: 'two' }] },
-        { $: { id: '2' },
+                               { $: { sub: '2' }, _: 'two' }]
+        },
+        {
+          $: { id: '2' },
           _: ' item  one two three  four',
-          subitem: [{ _: 'three' }, { _: 'four' }, { _: 'five' }] }]
-      var actualItems = []
-      var actualSubitems = []
-      var expectedSubitems = [
+          subitem: [{ _: 'three' }, { _: 'four' }, { _: 'five' }]
+        }]
+      const actualItems = []
+      const actualSubitems = []
+      const expectedSubitems = [
         { $: { sub: 'TESTING SUB' }, _: 'one' },
         { $: { sub: '2' }, _: 'two' },
         { _: 'three' },
         { _: 'four' },
         { _: 'five' }
       ]
-      var actualData = []
-      var dataEventCount = 0
-      var itemEventCount = 0
-      var subitemEventCount = 0
+      const actualData = []
+      let dataEventCount = 0
+      let itemEventCount = 0
+      let subitemEventCount = 0
 
       parser.on('data', function (data) {
         actualData.push(data)
@@ -994,12 +1033,12 @@ describe('Tests', function () {
     })
 
     it('should properly parse a huge file.', function (done) {
-      var xmlStream = fs.createReadStream('./test/TestFiles/hugeFile.xml')
-      var parser = new ParserFactory()
+      const xmlStream = fs.createReadStream('./test/TestFiles/hugeFile.xml')
+      const parser = new ParserFactory()
 
-      var dataEventCount = 0
-      var itemEventCount = 0
-      var subitemEventCount = 0
+      let dataEventCount = 0
+      let itemEventCount = 0
+      let subitemEventCount = 0
 
       parser.on('data', function (data) {
         dataEventCount++
@@ -1030,22 +1069,25 @@ describe('Tests', function () {
     })
 
     it('should properly parse a simple file and return when root element when listening on it.', function (done) {
-      var xmlStream = fs.createReadStream('./test/TestFiles/item.xml')
-      var parser = new ParserFactory()
-      var expectedData =
-        [{ item: [{ $: { id: '1', test: 'hello' },
-          subitem: [{ $: { sub: 'TESTING SUB' }, _: 'one' },
-            { $: { sub: '2' }, _: 'two' }]
-        },
-        { $: { id: '2' },
-          subitem: [{ _: 'three' }, { _: 'four' },
-            { _: 'five' }]
-        }]
+      const xmlStream = fs.createReadStream('./test/TestFiles/item.xml')
+      const parser = new ParserFactory()
+      const expectedData =
+        [{
+          item: [{
+            $: { id: '1', test: 'hello' },
+            subitem: [{ $: { sub: 'TESTING SUB' }, _: 'one' },
+              { $: { sub: '2' }, _: 'two' }]
+          },
+          {
+            $: { id: '2' },
+            subitem: [{ _: 'three' }, { _: 'four' },
+              { _: 'five' }]
+          }]
         }]
 
-      var actualData = []
-      var dataEventCount = 0
-      var itemsEventCount = 0
+      const actualData = []
+      let dataEventCount = 0
+      let itemsEventCount = 0
 
       parser.on('data', function (data) {
         actualData.push(data)
@@ -1076,25 +1118,25 @@ describe('Tests', function () {
 
   describe.skip('performance testing', function () {
     it('should properly parse more than 500 MB of file.', function (done) {
-      var parser = new ParserFactory({ resourcePath: '/items/item' })
+      const parser = new ParserFactory({ resourcePath: '/items/item' })
       // var wsStream = fs.createWriteStream('./test/TestFiles/MB_and_GB_size_files/MBFile.xml')
       // var rsStream = fs.createReadStream('./test/TestFiles/MB_and_GB_size_files/MBFile.xml')
-      var dataEventCount = 0
+      let dataEventCount = 0
       // var maxRSSMemoryTaken = 0
       // var rss
-      var startTime = Date.now()
-      var xmlStream = new stream.Readable()
+      const startTime = Date.now()
+      const xmlStream = new stream.Readable()
       xmlStream._read = function noop () {}
-      var dataChunk
+      let dataChunk
       this.timeout(900000)
-      var firstChunk = fs.readFileSync('./test/TestFiles/MB_and_GB_size_files/firstChunk.xml')
+      const firstChunk = fs.readFileSync('./test/TestFiles/MB_and_GB_size_files/firstChunk.xml')
       xmlStream.push(firstChunk)
-      for (var i = 0; i < 2200; i++) {
+      for (let i = 0; i < 2200; i++) {
         dataChunk = fs.readFileSync('./test/TestFiles/MB_and_GB_size_files/repetitiveChunk.xml')
         xmlStream.push(dataChunk)
       }
 
-      var endingChunk = fs.readFileSync('./test/TestFiles/MB_and_GB_size_files/endingChunk.xml')
+      const endingChunk = fs.readFileSync('./test/TestFiles/MB_and_GB_size_files/endingChunk.xml')
       xmlStream.push(endingChunk)
       xmlStream.push(null)
       parser.on('data', function (data) {
@@ -1111,7 +1153,7 @@ describe('Tests', function () {
       parser.on('end', function () {
         // console.log('dataEventCount=', dataEventCount)
         // console.log('RSS memory=', rss)
-        var TimeTaken = Date.now() - startTime
+        const TimeTaken = Date.now() - startTime
         // console.log('time taken=', TimeTaken)
         TimeTaken.should.be.belowOrEqual(300000)
         dataEventCount.should.equal(4558400)
@@ -1121,25 +1163,25 @@ describe('Tests', function () {
     })
 
     it('should properly parse more than 1 GB of file.', function (done) {
-      var parser = new ParserFactory({ resourcePath: '/items/item' })
+      const parser = new ParserFactory({ resourcePath: '/items/item' })
       // var wsStream = fs.createWriteStream('./test/TestFiles/MB_and_GB_size_files/MBFile.xml')
       // var rsStream = fs.createReadStream('./test/TestFiles/MB_and_GB_size_files/MBFile.xml')
-      var dataEventCount = 0
+      let dataEventCount = 0
       // var maxRSSMemoryTaken = 0
       // var rss
-      var startTime = Date.now()
-      var xmlStream = new stream.Readable()
+      const startTime = Date.now()
+      const xmlStream = new stream.Readable()
       xmlStream._read = function noop () {}
-      var dataChunk
+      let dataChunk
       this.timeout(900000)
-      var firstChunk = fs.readFileSync('./test/TestFiles/MB_and_GB_size_files/firstChunk.xml')
+      const firstChunk = fs.readFileSync('./test/TestFiles/MB_and_GB_size_files/firstChunk.xml')
       xmlStream.push(firstChunk)
-      for (var i = 0; i < 4400; i++) {
+      for (let i = 0; i < 4400; i++) {
         dataChunk = fs.readFileSync('./test/TestFiles/MB_and_GB_size_files/repetitiveChunk.xml')
         xmlStream.push(dataChunk)
       }
 
-      var endingChunk = fs.readFileSync('./test/TestFiles/MB_and_GB_size_files/endingChunk.xml')
+      const endingChunk = fs.readFileSync('./test/TestFiles/MB_and_GB_size_files/endingChunk.xml')
       xmlStream.push(endingChunk)
       xmlStream.push(null)
       parser.on('data', function (data) {
@@ -1156,7 +1198,7 @@ describe('Tests', function () {
       parser.on('end', function () {
         // console.log('dataEventCount=', dataEventCount)
         // console.log('RSS memory=', rss)
-        var TimeTaken = Date.now() - startTime
+        const TimeTaken = Date.now() - startTime
         // console.log('time taken=', TimeTaken)
         TimeTaken.should.be.belowOrEqual(700000)
         dataEventCount.should.equal(9116800)
@@ -1168,12 +1210,12 @@ describe('Tests', function () {
 
   describe('nodes with same names', function () {
     it('should properly parse a simple file containing nodes with same names.', function (done) {
-      var xmlStream = fs.createReadStream('./test/TestFiles/nodesWithSameNames.xml')
-      var parser = new ParserFactory()
+      const xmlStream = fs.createReadStream('./test/TestFiles/nodesWithSameNames.xml')
+      const parser = new ParserFactory()
 
-      var actualData = []
-      var actualItems = []
-      var dataEventCount = 0
+      const actualData = []
+      const actualItems = []
+      let dataEventCount = 0
 
       parser.on('data', function (data) {
         actualData.push(data)
@@ -1199,12 +1241,12 @@ describe('Tests', function () {
     })
 
     it('should properly parse a simple file containing nodes with same names and emit events on multiple nodes.', function (done) {
-      var xmlStream = fs.createReadStream('./test/TestFiles/nodesWithSameNames.xml')
-      var parser = new ParserFactory()
+      const xmlStream = fs.createReadStream('./test/TestFiles/nodesWithSameNames.xml')
+      const parser = new ParserFactory()
 
-      var dataEventCount = 0
-      var itemEventCount = 0
-      var subitemEventCount = 0
+      let dataEventCount = 0
+      let itemEventCount = 0
+      let subitemEventCount = 0
 
       parser.on('data', function (data) {
         dataEventCount++
@@ -1234,12 +1276,12 @@ describe('Tests', function () {
     })
 
     it('should properly parse a medium size file with same names randomly.', function (done) {
-      var xmlStream = fs.createReadStream('./test/TestFiles/nodesWithSameNamesRandomly.xml')
-      var parser = new ParserFactory()
+      const xmlStream = fs.createReadStream('./test/TestFiles/nodesWithSameNamesRandomly.xml')
+      const parser = new ParserFactory()
 
-      var dataEventCount = 0
-      var itemEventCount = 0
-      var subitemEventCount = 0
+      let dataEventCount = 0
+      let itemEventCount = 0
+      let subitemEventCount = 0
 
       parser.on('data', function (data) {
         dataEventCount++
@@ -1272,15 +1314,19 @@ describe('Tests', function () {
 
   describe('Parse funtion should work properly', function () {
     it('should properly parse a simple file.', function (done) {
-      var xml = fs.readFileSync('./test/TestFiles/item.xml')
-      var parser = new ParserFactory({ resourcePath: '/items/item' })
-      var expectedData = [
-        { $: { id: '1', test: 'hello' },
+      const xml = fs.readFileSync('./test/TestFiles/item.xml')
+      const parser = new ParserFactory({ resourcePath: '/items/item' })
+      const expectedData = [
+        {
+          $: { id: '1', test: 'hello' },
           subitem:
                              [{ $: { sub: 'TESTING SUB' }, _: 'one' },
-                               { $: { sub: '2' }, _: 'two' }] },
-        { $: { id: '2' },
-          subitem: [{ _: 'three' }, { _: 'four' }, { _: 'five' }] }]
+                               { $: { sub: '2' }, _: 'two' }]
+        },
+        {
+          $: { id: '2' },
+          subitem: [{ _: 'three' }, { _: 'four' }, { _: 'five' }]
+        }]
 
       parser.parse(xml.toString(), function (err, data) {
         if (err) done(err)
@@ -1290,8 +1336,8 @@ describe('Tests', function () {
     })
 
     it('should properly parse a medium size file.', function (done) {
-      var xml = fs.readFileSync('./test/TestFiles/medium.xml')
-      var parser = new ParserFactory({ resourcePath: '/items/item' })
+      const xml = fs.readFileSync('./test/TestFiles/medium.xml')
+      const parser = new ParserFactory({ resourcePath: '/items/item' })
 
       parser.parse(xml, function (err, data) {
         if (err) done(err)
@@ -1301,8 +1347,8 @@ describe('Tests', function () {
     })
 
     it('should properly parse a file containing many nodes.', function (done) {
-      var xml = fs.readFileSync('./test/TestFiles/manyItems.xml')
-      var parser = new ParserFactory({ resourcePath: '/items/item' })
+      const xml = fs.readFileSync('./test/TestFiles/manyItems.xml')
+      const parser = new ParserFactory({ resourcePath: '/items/item' })
 
       parser.parse(xml, function (err, data) {
         if (err) done(err)
@@ -1312,15 +1358,19 @@ describe('Tests', function () {
     })
 
     it('should properly parse a xml simple file in which nodes contain text values randomly.', function (done) {
-      var xml = fs.readFileSync('./test/TestFiles/randomText.xml')
-      var parser = new ParserFactory({ resourcePath: '/items/item' })
-      var expectedData = [{ $: { id: '1', test: 'hello' },
+      const xml = fs.readFileSync('./test/TestFiles/randomText.xml')
+      const parser = new ParserFactory({ resourcePath: '/items/item' })
+      const expectedData = [{
+        $: { id: '1', test: 'hello' },
         _: ' item  one  two',
         subitem: [{ $: { sub: 'TESTING SUB' }, _: 'one' },
-          { $: { sub: '2' }, _: 'two' }] },
-      { $: { id: '2' },
+          { $: { sub: '2' }, _: 'two' }]
+      },
+      {
+        $: { id: '2' },
         _: ' item  one two three  four',
-        subitem: [{ _: 'three' }, { _: 'four' }, { _: 'five' }] }
+        subitem: [{ _: 'three' }, { _: 'four' }, { _: 'five' }]
+      }
       ]
 
       parser.parse(xml, function (err, data) {
@@ -1332,8 +1382,8 @@ describe('Tests', function () {
     })
 
     it('should properly parse a huge file.', function (done) {
-      var xml = fs.readFileSync('./test/TestFiles/hugeFile.xml')
-      var parser = new ParserFactory({ resourcePath: '/items/item' })
+      const xml = fs.readFileSync('./test/TestFiles/hugeFile.xml')
+      const parser = new ParserFactory({ resourcePath: '/items/item' })
       // console.log(parser)
       parser.parse(xml, function (err, data) {
         if (err) done(err)
@@ -1343,8 +1393,8 @@ describe('Tests', function () {
     })
 
     it('should properly return error if the xml file is corrupted.', function (done) {
-      var xml = fs.readFileSync('./test/TestFiles/corrupted.xml')
-      var parser = new ParserFactory({ resourcePath: '/items/item' })
+      const xml = fs.readFileSync('./test/TestFiles/corrupted.xml')
+      const parser = new ParserFactory({ resourcePath: '/items/item' })
 
       parser.parse(xml, function (err, data) {
         // console.log(err)
@@ -1357,13 +1407,17 @@ describe('Tests', function () {
 
   describe('should respect explicitArray constructor option', function () {
     it('should properly parse a simple file with explicitArray set to false.', function (done) {
-      var xml = fs.readFileSync('./test/TestFiles/item.xml')
-      var parser = new ParserFactory({ resourcePath: '/items/item', explicitArray: false })
-      var expectedData = [
-        { $: { id: '1', test: 'hello' },
-          subitem: { $: { sub: '2' }, _: 'two' } },
-        { $: { id: '2' },
-          subitem: { _: 'five' } }]
+      const xml = fs.readFileSync('./test/TestFiles/item.xml')
+      const parser = new ParserFactory({ resourcePath: '/items/item', explicitArray: false })
+      const expectedData = [
+        {
+          $: { id: '1', test: 'hello' },
+          subitem: { $: { sub: '2' }, _: 'two' }
+        },
+        {
+          $: { id: '2' },
+          subitem: { _: 'five' }
+        }]
 
       parser.parse(xml.toString(), function (err, data) {
         if (err) done(err)
@@ -1374,9 +1428,9 @@ describe('Tests', function () {
     })
 
     it('should properly parse a medium size file with explicitArray set to false.', function (done) {
-      var xml = fs.readFileSync('./test/TestFiles/medium.xml')
-      var parser = new ParserFactory({ resourcePath: '/items/item', explicitArray: false })
-      var expectedData = [
+      const xml = fs.readFileSync('./test/TestFiles/medium.xml')
+      const parser = new ParserFactory({ resourcePath: '/items/item', explicitArray: false })
+      const expectedData = [
         {
           $: {
             id: '1',
@@ -1504,8 +1558,8 @@ describe('Tests', function () {
     })
 
     it('should properly parse a file containing many nodes when explicitArray set to false.', function (done) {
-      var xml = fs.readFileSync('./test/TestFiles/manyItems.xml')
-      var parser = new ParserFactory({ resourcePath: '/items/item', explicitArray: false })
+      const xml = fs.readFileSync('./test/TestFiles/manyItems.xml')
+      const parser = new ParserFactory({ resourcePath: '/items/item', explicitArray: false })
 
       parser.parse(xml, function (err, data) {
         if (err) done(err)
@@ -1516,14 +1570,18 @@ describe('Tests', function () {
     })
 
     it('should properly parse a xml simple file in which nodes contain text values randomly when explicitArray set to false.', function (done) {
-      var xml = fs.readFileSync('./test/TestFiles/randomText.xml')
-      var parser = new ParserFactory({ resourcePath: '/items/item', explicitArray: false })
-      var expectedData = [{ $: { id: '1', test: 'hello' },
+      const xml = fs.readFileSync('./test/TestFiles/randomText.xml')
+      const parser = new ParserFactory({ resourcePath: '/items/item', explicitArray: false })
+      const expectedData = [{
+        $: { id: '1', test: 'hello' },
         _: ' item  one  two',
-        subitem: { $: { sub: '2' }, _: 'two' } },
-      { $: { id: '2' },
+        subitem: { $: { sub: '2' }, _: 'two' }
+      },
+      {
+        $: { id: '2' },
         _: ' item  one two three  four',
-        subitem: { _: 'five' } }
+        subitem: { _: 'five' }
+      }
       ]
 
       parser.parse(xml, function (err, data) {
@@ -1536,8 +1594,8 @@ describe('Tests', function () {
     })
 
     it('should properly parse a huge file with explicitArray set to false.', function (done) {
-      var xml = fs.readFileSync('./test/TestFiles/hugeFile.xml')
-      var parser = new ParserFactory({ resourcePath: '/items/item', explicitArray: false })
+      const xml = fs.readFileSync('./test/TestFiles/hugeFile.xml')
+      const parser = new ParserFactory({ resourcePath: '/items/item', explicitArray: false })
       // console.log(parser)
       parser.parse(xml, function (err, data) {
         if (err) done(err)
@@ -1547,8 +1605,8 @@ describe('Tests', function () {
     })
 
     it('should properly return error if the xml file is corrupted.', function (done) {
-      var xml = fs.readFileSync('./test/TestFiles/corrupted.xml')
-      var parser = new ParserFactory({ resourcePath: '/items/item', explicitArray: false })
+      const xml = fs.readFileSync('./test/TestFiles/corrupted.xml')
+      const parser = new ParserFactory({ resourcePath: '/items/item', explicitArray: false })
 
       parser.parse(xml, function (err, data) {
         // console.log(err)
@@ -1559,15 +1617,19 @@ describe('Tests', function () {
     })
 
     it('should properly generate objects when special symbols are passed as attrs and text keys and explicitArray is false in the options.', function (done) {
-      var xmlStream = fs.createReadStream('./test/TestFiles/item.xml')
-      var parser = new ParserFactory({ resourcePath: '/items/item', attrsKey: '!', textKey: '%', explicitArray: false })
-      var expectedData = [
-        { '!': { id: '1', test: 'hello' },
-          subitem: { '!': { sub: '2' }, '%': 'two' } },
-        { '!': { id: '2' },
-          subitem: { '%': 'five' } }]
-      var actualData = []
-      var dataEventCount = 0
+      const xmlStream = fs.createReadStream('./test/TestFiles/item.xml')
+      const parser = new ParserFactory({ resourcePath: '/items/item', attrsKey: '!', textKey: '%', explicitArray: false })
+      const expectedData = [
+        {
+          '!': { id: '1', test: 'hello' },
+          subitem: { '!': { sub: '2' }, '%': 'two' }
+        },
+        {
+          '!': { id: '2' },
+          subitem: { '%': 'five' }
+        }]
+      const actualData = []
+      let dataEventCount = 0
 
       parser.on('data', function (data) {
         actualData.push(data)

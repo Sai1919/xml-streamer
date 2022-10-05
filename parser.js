@@ -1,11 +1,11 @@
-var { StringDecoder } = require('string_decoder')
-var expat = require('node-expat')
-var _ = require('lodash')
-var util = require('util')
-var stream = require('stream')
+const { StringDecoder } = require('string_decoder')
+const expat = require('node-expat')
+const _ = require('lodash')
+const util = require('util')
+const stream = require('stream')
 
-var ParserState = require('./parserState')
-var defaults = {
+const ParserState = require('./parserState')
+const defaults = {
   resourcePath: '',
   emitOnNodeName: false,
   attrsKey: '$',
@@ -25,10 +25,10 @@ function XmlParser (opts) {
 util.inherits(XmlParser, stream.Transform)
 
 XmlParser.prototype.checkForInterestedNodeListeners = function () {
-  var ignore = ['end', 'prefinish', 'data', 'error']
-  var eventNames = Object.keys(this._events)
+  const ignore = ['end', 'prefinish', 'data', 'error']
+  const eventNames = Object.keys(this._events)
 
-  for (var i = 0; i < eventNames.length; i++) {
+  for (let i = 0; i < eventNames.length; i++) {
     if (_.includes(ignore, eventNames[i], 0)) continue
     this.parserState.interestedNodes.push(eventNames[i])
   }
@@ -42,9 +42,9 @@ XmlParser.prototype._transform = function (chunk, encoding, callback) {
 }
 
 XmlParser.prototype.processChunk = function (chunk) {
-  var parser = this.parser
-  var state = this.parserState
-  var toWrite
+  const parser = this.parser
+  const state = this.parserState
+  let toWrite
 
   if (state.isRootNode) {
     this.checkForInterestedNodeListeners()
@@ -61,9 +61,9 @@ XmlParser.prototype.processChunk = function (chunk) {
 }
 
 XmlParser.prototype.parse = function (chunk, cb) {
-  var parser = this.parser
-  var state = this.parserState
-  var error
+  const parser = this.parser
+  const state = this.parserState
+  let error
 
   if (state.isRootNode) {
     this.checkForInterestedNodeListeners()
@@ -76,7 +76,7 @@ XmlParser.prototype.parse = function (chunk, cb) {
     error = err
   })
 
-  var toWrite = this.stringDecoder.write(chunk)
+  const toWrite = this.stringDecoder.write(chunk)
   if (toWrite.length && !parser.parse(toWrite)) {
     error = processError.call(this)
   }
@@ -87,16 +87,16 @@ XmlParser.prototype.parse = function (chunk, cb) {
 }
 
 function registerEvents () {
-  var scope = this
-  var parser = this.parser
-  var state = this.parserState
-  var lastIndex
-  var resourcePath = this.opts.resourcePath
-  var attrsKey = this.opts.attrsKey
-  var textKey = this.opts.textKey
-  var interestedNodes = state.interestedNodes
-  var explicitArray = this.opts.explicitArray
-  var verbatimText = this.opts.verbatimText
+  const scope = this
+  const parser = this.parser
+  const state = this.parserState
+  let lastIndex
+  const resourcePath = this.opts.resourcePath
+  const attrsKey = this.opts.attrsKey
+  const textKey = this.opts.textKey
+  const interestedNodes = state.interestedNodes
+  const explicitArray = this.opts.explicitArray
+  const verbatimText = this.opts.verbatimText
 
   parser.on('startElement', function (name, attrs) {
     if (state.isRootNode) state.isRootNode = false
@@ -124,17 +124,17 @@ function registerEvents () {
   function processStartElement (name, attrs) {
     if (!name) return
 
-    var obj = {}
+    const obj = {}
     if (attrs && !_.isEmpty(attrs)) obj[attrsKey] = attrs
-    var tempObj = state.object
-    var path = getRelativePath(name)
+    let tempObj = state.object
+    const path = getRelativePath(name)
     if (!path) {
       if (attrs && !_.isEmpty(attrs)) state.object[attrsKey] = attrs
       return
     }
-    var tokens = path.split('.')
+    const tokens = path.split('.')
 
-    for (var i = 0; i < tokens.length; i++) {
+    for (let i = 0; i < tokens.length; i++) {
       if (tempObj[tokens[i]] && !(explicitArray === false && i === tokens.length - 1)) {
         tempObj = tempObj[tokens[i]]
       } else {
@@ -153,8 +153,8 @@ function registerEvents () {
 
   function processEndElement (name) {
     if (resourcePath) {
-      var index = resourcePath.lastIndexOf('/')
-      var rpath = resourcePath.substring(0, index)
+      const index = resourcePath.lastIndexOf('/')
+      const rpath = resourcePath.substring(0, index)
 
       if (rpath === state.currentPath) {
         scope.push(state.object)
@@ -174,17 +174,13 @@ function registerEvents () {
   }
 
   function emitInterestedNode (name) {
-    var index
-    var xpath
-    var pathTokens
-
-    xpath = state.currentPath.substring(1)
-    pathTokens = xpath.split('/')
+    const xpath = state.currentPath.substring(1)
+    let pathTokens = xpath.split('/')
     pathTokens.push(name)
-    index = pathTokens.indexOf(state.firstFoundNode)
+    const index = pathTokens.indexOf(state.firstFoundNode)
     pathTokens = _.drop(pathTokens, index + 1)
-    var tempObj = state.object
-    for (var i = 0; i < pathTokens.length; i++) {
+    let tempObj = state.object
+    for (let i = 0; i < pathTokens.length; i++) {
       tempObj = tempObj[pathTokens[i]]
     }
     if (Array.isArray(tempObj)) tempObj = tempObj[tempObj.length - 1]
@@ -196,15 +192,15 @@ function registerEvents () {
     if ((!text) || ((!verbatimText) && !/\S/.test(text))) {
       return
     }
-    var path = getRelativePath()
-    var tempObj = state.object
+    const path = getRelativePath()
+    let tempObj = state.object
     if (!path) {
       if (!state.object[textKey]) state.object[textKey] = ''
       state.object[textKey] = state.object[textKey] + text
       return
     }
-    var tokens = path.split('.')
-    for (var i = 0; i < tokens.length; i++) {
+    const tokens = path.split('.')
+    for (let i = 0; i < tokens.length; i++) {
       if (tempObj[tokens[i]]) {
         tempObj = tempObj[tokens[i]]
       } else {
@@ -215,7 +211,7 @@ function registerEvents () {
     }
 
     if (Array.isArray(tempObj)) {
-      var obj = tempObj[tempObj.length - 1]
+      const obj = tempObj[tempObj.length - 1]
       if (!obj[textKey]) obj[textKey] = ''
       obj[textKey] = obj[textKey] + text
     } else {
@@ -242,19 +238,19 @@ function registerEvents () {
   }
 
   function getRelativePath () {
-    var tokens
-    var jsonPath
-    var index
+    let tokens
+    let jsonPath
+    let index
 
     if (resourcePath) {
-      var xpath = state.currentPath.substring(resourcePath.length)
+      let xpath = state.currentPath.substring(resourcePath.length)
 
       if (!xpath) return
       if (xpath[0] === '/') xpath = xpath.substring(1)
       tokens = xpath.split('/')
       jsonPath = tokens.join('.')
     } else {
-      xpath = state.currentPath.substring(1)
+      const xpath = state.currentPath.substring(1)
       tokens = xpath.split('/')
       index = tokens.indexOf(state.firstFoundNode)
       tokens = _.drop(tokens, index + 1)
@@ -265,8 +261,8 @@ function registerEvents () {
 }
 
 function processError (err) {
-  var parser = this.parser
-  var error = ''
+  const parser = this.parser
+  let error = ''
 
   if (err) {
     error = err
@@ -281,8 +277,8 @@ function processError (err) {
 function readBuffer (buffer) {
   if (!buffer) return undefined
 
-  var head = buffer.head
-  var data = []
+  let head = buffer.head
+  const data = []
 
   while (head) {
     data.push(head.data)
