@@ -7,6 +7,7 @@ const stream = require('stream')
 const ParserState = require('./parserState')
 const defaults = {
   resourcePath: '',
+  resourcePathCaseInsensitive: false,
   emitOnNodeName: false,
   attrsKey: '$',
   textKey: '_',
@@ -91,7 +92,8 @@ function registerEvents () {
   const parser = this.parser
   const state = this.parserState
   let lastIndex
-  const resourcePath = this.opts.resourcePath
+  const resourcePath = this.opts.resourcePathCaseInsensitive ? (this.opts.resourcePath && this.opts.resourcePath.toLowerCase()) : this.opts.resourcePath
+  const resourcePathCaseInsensitive = this.opts.resourcePathCaseInsensitive
   const attrsKey = this.opts.attrsKey
   const textKey = this.opts.textKey
   const interestedNodes = state.interestedNodes
@@ -156,7 +158,9 @@ function registerEvents () {
       const index = resourcePath.lastIndexOf('/')
       const rpath = resourcePath.substring(0, index)
 
-      if (rpath === state.currentPath) {
+      const _currentPath = resourcePathCaseInsensitive ? state.currentPath.toLowerCase() : state.currentPath
+
+      if (rpath === _currentPath) {
         scope.push(state.object)
         if (scope.opts.emitOnNodeName) scope.emit(name, state.object)
         state.object = {}
@@ -222,11 +226,8 @@ function registerEvents () {
 
   function checkForResourcePath (name) {
     if (resourcePath) {
-      if (state.currentPath.indexOf(resourcePath) === 0) {
-        state.isPathfound = true
-      } else {
-        state.isPathfound = false
-      }
+      let _currentPath = resourcePathCaseInsensitive ? state.currentPath.toLowerCase() : state.currentPath
+      state.isPathfound = _currentPath.indexOf(resourcePath) === 0
     } else {
       if (_.includes(interestedNodes, name, 0)) {
         state.isPathfound = true
